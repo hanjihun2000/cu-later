@@ -11,11 +11,12 @@ services:
     environment:
       - NODE_ENV=production
       # Add any additional environment variables here
+      - DB=mongodb://admin:password@db:27017
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       - db
-    command: npm start
+    command: sh -c "yarn && npm start"
 
   db:
     image: mongo:latest
@@ -28,7 +29,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
-      # Add any additional environment variables here
 
 volumes:
   mongodata:

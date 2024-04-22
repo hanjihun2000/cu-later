@@ -116,8 +116,5 @@
   "bugs": {
     "url": "https://github.com/Kevinray-Lu/551-Final-Trojans/issues"
   },
-  "homepage": "https://github.com/Kevinray-Lu/551-Final-Trojans#readme",
-  "engines": {
-    "node": "18.x"
-  }
+  "homepage": "https://github.com/Kevinray-Lu/551-Final-Trojans#readme"
 }
