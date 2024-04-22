@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  app:
+    image: node:18
+    container_name: trojans_app
+    restart: always
+    working_dir: /usr/src/app
+    volumes:
+      - ./app:/usr/src/app
+    environment:
+      - NODE_ENV=production
+      # Add any additional environment variables here
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    command: npm start
+
+  db:
+    image: mongo:latest
+    container_name: trojans_db
+    restart: always
+    volumes:
+      - mongodata:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      # Add any additional environment variables here
+
+volumes:
+  mongodata:
