@@ -744,6 +744,13 @@
   dependencies:
     sparse-bitfield "^3.0.3"
 
+"@types/hbs@^4.0.4":
+  version "4.0.4"
+  resolved "https://registry.npmjs.org/@types/hbs/-/hbs-4.0.4.tgz"
+  integrity sha512-GH3SIb2tzDBnTByUSOIVcD6AcLufnydBllTuFAIAGMhqPNbz8GL4tLryVdNqhq0NQEb5mVpu2FJOrUeqwJrPtg==
+  dependencies:
+    handlebars "^4.1.0"
+
 "@types/node@*":
   version "18.14.1"
   resolved "https://registry.npmjs.org/@types/node/-/node-18.14.1.tgz"
@@ -1120,7 +1127,7 @@ graceful-fs@^4.2.10:
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.10.tgz"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
 
-handlebars@^4.7.7, handlebars@4.7.7:
+handlebars@^4.1.0, handlebars@^4.7.7, handlebars@4.7.7:
   version "4.7.7"
   resolved "https://registry.npmjs.org/handlebars/-/handlebars-4.7.7.tgz"
   integrity sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==

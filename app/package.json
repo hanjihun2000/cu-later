@@ -115,5 +115,8 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/hanjihun2000/cu-later/issues"
+  },
+  "devDependencies": {
+    "@types/hbs": "^4.0.4"
   }
 }

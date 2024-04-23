@@ -10,7 +10,21 @@ const session = require("express-session");
 const auth = require("./auth.js");
 const exphbs = require("express-handlebars");
 var fs = require("fs");
+var hbs = require("hbs");
 var path = require("path");
+
+// register partials for handlebars
+var partialsDir = __dirname + "/views/partials";
+var filenames = fs.readdirSync(partialsDir);
+filenames.forEach(function (filename) {
+  var matches = /^([^.]+).hbs$/.exec(filename);
+  if (!matches) {
+    return;
+  }
+  var name = matches[1];
+  var template = fs.readFileSync(partialsDir + "/" + filename, "utf8");
+  hbs.registerPartial(name, template);
+});
 
 // use public folder and handlebars engine
 app.use(express.static("public"));
