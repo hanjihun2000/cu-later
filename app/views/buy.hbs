@@ -53,49 +53,99 @@
             <div class="shop-list-toolbar">
             </div>
             <!--shop-gird view-->
+            <div class="shop-list-toolbar">
+              <form action="/search" method="GET">
+                <input type="text" name="query" placeholder="Search">
+                <button type="submit">Search</button>
+              </form>
+            </div>
             <div class="row">
               <div class="show-gird-product another">
-                <ol>
-                  {{#each shop}}
-                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                      <div class="single-product">
-                        <div class="product-img">
-                          <a class="b-s-p-img" href="/buy/{{_id}}">
-                            <img
-                              src="data:{{img.contentType}};base64,{{img.data}}"
-                            />
-                          </a>
-                          <div class="img-block">
-                            <div class="primary-icon">
-                              <a href="/buy/{{_id}}"><i
-                                  class="fa fa-random"
-                                ></i></a>
-                              <a href="/buy/{{_id}}"><i
-                                  class="fa fa-eye"
-                                ></i></a>
-                            </div>
-                            <div class="hover-icon">
-                              <span class="random"><a href="/buy/{{_id}}"><i
+                {{#if searchResults}}
+                  <ol>
+                    {{#each searchResults}}
+                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <div class="single-product">
+                          <div class="product-img">
+                            <a class="b-s-p-img" href="/buy/{{_id}}">
+                              <img
+                                src="data:{{img.contentType}};base64,{{img.data}}"
+                              />
+                            </a>
+                            <div class="img-block">
+                              <div class="primary-icon">
+                                <a href="/buy/{{_id}}"><i
                                     class="fa fa-random"
-                                  ></i></a></span>
-                              <span class="eye"><a href="/buy/{{_id}}"><i
+                                  ></i></a>
+                                <a href="/buy/{{_id}}"><i
                                     class="fa fa-eye"
-                                  ></i>Quick view</a></span>
+                                  ></i></a>
+                              </div>
+                              <div class="hover-icon">
+                                <span class="random"><a href="/buy/{{_id}}"><i
+                                      class="fa fa-random"
+                                    ></i></a></span>
+                                <span class="eye"><a href="/buy/{{_id}}"><i
+                                      class="fa fa-eye"
+                                    ></i>Quick view</a></span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div class="product-block-text">
-                          <h3><a href="/buy/{{_id}}">{{title}}<span
-                              >Price:${{price}}</span></a></h3>
-                          <p><small>{{description}}</small></p>
-                          {{! <button type="submit">buy now</button> }}
-                          <a class="p-b-t-a-c" href="/buy/{{_id}}">view more</a>
-                          {{! <input type="submit" value="Add"> }}
+                          <div class="product-block-text">
+                            <h3><a href="/buy/{{_id}}">{{title}}<span
+                                >Price:${{price}}</span></a></h3>
+                            <p><small>{{description}}</small></p>
+                            {{! <button type="submit">buy now</button> }}
+                            <a class="p-b-t-a-c" href="/buy/{{_id}}">view more</a>
+                            {{! <input type="submit" value="Add"> }}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  {{/each}}
-                </ol>
+                    {{/each}}
+                  </ol>
+                {{else}}
+                  <ol>
+                    {{#each shop}}
+                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <div class="single-product">
+                          <div class="product-img">
+                            <a class="b-s-p-img" href="/buy/{{_id}}">
+                              <img
+                                src="data:{{img.contentType}};base64,{{img.data}}"
+                              />
+                            </a>
+                            <div class="img-block">
+                              <div class="primary-icon">
+                                <a href="/buy/{{_id}}"><i
+                                    class="fa fa-random"
+                                  ></i></a>
+                                <a href="/buy/{{_id}}"><i
+                                    class="fa fa-eye"
+                                  ></i></a>
+                              </div>
+                              <div class="hover-icon">
+                                <span class="random"><a href="/buy/{{_id}}"><i
+                                      class="fa fa-random"
+                                    ></i></a></span>
+                                <span class="eye"><a href="/buy/{{_id}}"><i
+                                      class="fa fa-eye"
+                                    ></i>Quick view</a></span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="product-block-text">
+                            <h3><a href="/buy/{{_id}}">{{title}}<span
+                                >Price:${{price}}</span></a></h3>
+                            <p><small>{{description}}</small></p>
+                            {{! <button type="submit">buy now</button> }}
+                            <a class="p-b-t-a-c" href="/buy/{{_id}}">view more</a>
+                            {{! <input type="submit" value="Add"> }}
+                          </div>
+                        </div>
+                      </div>
+                    {{/each}}
+                  </ol>
+                {{/if}}
               </div>
             </div>
           </div>

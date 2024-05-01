@@ -1,11 +1,17 @@
-// use bcrypt to hash passwords
 const bcrypt = require("bcryptjs");
-// Connect MongoDB
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
 
 // function to register new users
 function register(username, email, password, errorCallback, successCallback) {
+  // check if email is valid (CUHK email)
+  console.log(email);
+  const validation = /\b1155\d{6}@link.cuhk.edu.hk$/;
+  if (!email.match(validation)) {
+    console.log("email is not a valid CUHK email!");
+    errorCallback({ message: "EMAIL IS NOT A VALID CUHK EMAIL" });
+    return;
+  }
   // check if user already exists
   User.findOne({ username: username }, (err, result, count) => {
     if (result) {

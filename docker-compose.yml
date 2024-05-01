@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    image: node:18
+    image: node:latest
     container_name: cu-later-app
     restart: always
     working_dir: /usr/src/app
@@ -10,7 +10,6 @@ services:
       - ./app:/usr/src/app
     environment:
       - NODE_ENV=production
-      # Add any additional environment variables here
       - DB=mongodb://admin:password@db:27017
     ports:
       - "8080:8080"

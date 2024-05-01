@@ -41,6 +41,7 @@ app.use(session(sessionOptions));
 
 // to support picture storage
 var multer = require("multer");
+const status = require("statuses");
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -59,6 +60,36 @@ app.get("/", function (req, res) {
     res.render("home", { loggedIn: false });
   } else {
     res.render("home", { loggedIn: true });
+  }
+});
+
+app.get("/search", function (req, res) {
+  if (req.session.username === undefined) {
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
+  } else {
+    var query = req.query.query;
+    Item_buy.find(
+      { title: { $regex: query, $options: "i" }, status: { $ne: "finished" } },
+      function (err, varToStoreResult) {
+        if (err) {
+          console.log(err);
+        }
+        let items = varToStoreResult;
+        items = items.map((item) => {
+          // start mapping images
+          if (item.img.data !== undefined) {
+            item.img.data = item.img.data.toString("base64"); // convert the data into base64
+            item._id = item._id.toString();
+            item.img = item.img.toObject();
+          }
+          return item;
+        });
+        res.render("buy", { searchResults: items, loggedIn: true });
+      }
+    );
   }
 });
 
@@ -95,7 +126,6 @@ app.get("/buy", function (req, res) {
   }
 });
 
-// this is a test block for next function
 app.post("/buy", function (req, res) {
   key = Object.keys(req.body)[0];
   Item_buy.findOneAndUpdate(
@@ -143,7 +173,6 @@ app.post("/buy/:id", function (req, res) {
       if (err) {
         console.log("Something wrong when updating data!");
       } else {
-        // res.redirect("/buy");
         res.redirect("/personal");
       }
     }
@@ -349,9 +378,10 @@ app.get("/personal", function (req, res) {
       loggedIn: false,
     });
   }
-  // find all items user requested, and all other users that requested certain items of this user. will showcase two sections seperately.
-  // buyers are able to see updates of requested items, but cannot contact sellers directly.
-  // sellers are able to see requesters' emails and initiate contacts. They can also update items' availability by clicking denied (remove requesters) or finished (remove item since transaction is completed).
+  // Find all items user requested, and all other users that requested certain items of this user.
+  // Buyers are able to see updates of requested items, but cannot contact sellers directly.
+  // Sellers are able to see requesters' emails and initiate contacts.
+  // They can also update items' availability by clicking denied (remove requesters) or finished (remove item since transaction is completed).
   else {
     Item_buy.find(
       { owner: req.session.username.username, status: "requested" },
@@ -417,24 +447,6 @@ app.post("/personal", function (req, res) {
         } else {
           console.log(doc);
           res.redirect("/personal");
-          // if (doc !== null && doc.owner.length === 0) {
-          //   res.redirect("/personal");
-          // } else {
-          //   Item_share.findOneAndUpdate(
-          //     { _id: key },
-          //     {
-          //       $set: { status: result, requesters: [] },
-          //     },
-          //     { upsert: true },
-          //     (err, doc) => {
-          //       if (err) {
-          //         console.log("Something wrong when updating data!");
-          //       } else {
-          //         res.redirect("/personal");
-          //       }
-          //     }
-          //   );
-          // }
         }
       }
     );
@@ -453,24 +465,6 @@ app.post("/personal", function (req, res) {
           console.log("Something wrong when updating data!");
         } else {
           res.redirect("/personal");
-          // if (doc !== null && doc.owner.length === 0) {
-          //   res.redirect("/personal");
-          // } else {
-          //   Item_share.findOneAndUpdate(
-          //     { _id: key },
-          //     {
-          //       $set: { status: result, requesters: [] },
-          //     },
-          //     { upsert: true },
-          //     (err, doc) => {
-          //       if (err) {
-          //         console.log("Something wrong when updating data!");
-          //       } else {
-          //         res.redirect("/personal");
-          //       }
-          //     }
-          //   );
-          // }
         }
       }
     );
@@ -529,7 +523,7 @@ app.post("/login", (req, res) => {
   auth.login(req.body.username, req.body.password, error, success);
 });
 
-// Logout route
+// logout
 app.get("/logout", (req, res) => {
   // Clear the user's session or authentication token
   auth.logout(req, (err = undefined) => {
@@ -540,8 +534,6 @@ app.get("/logout", (req, res) => {
   });
 });
 
-// Configuration for GCP
-// Listen to the App Engine-specified port, or 8080 otherwise
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
