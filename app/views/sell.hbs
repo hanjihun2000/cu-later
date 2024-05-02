@@ -12,7 +12,9 @@
 
 
 		<!--LOGIN RESTRICTION-->
-    <p class="error" >{{error}}</p>
+        {{#if message}}
+        <div class="error">{{message}}</div>
+        {{/if}}
 
 
         <!--ADD ITEM START-->

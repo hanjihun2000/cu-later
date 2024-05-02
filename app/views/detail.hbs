@@ -16,7 +16,9 @@
 
 
     <!--LOGIN RESTRICTION-->
-    <p class="error" >{{error}}</p>
+    {{#if message}}
+      <div class="error">{{message}}</div>
+    {{/if}}
 
     <!--product header area start-->
     <div class="product-header-area">

@@ -14,67 +14,75 @@
         document.querySelector(".headerMenu").setAttribute("data-user", "false");
     </script>
 
-    <div class="loginArea">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-            <form method="POST" action="login">
-              <div class="form-fields">
-                <h2>Login</h2>
-                {{#if message}}
-                  <div class="error">{{message}}</div>
-                {{/if}}
-                <p>
-                  <label for="username">Username
-                    <span class="required">*</span></label>
-                  <input type="text" name="username" />
-                </p>
-                <p>
-                  <label>Password <span class="required">*</span></label>
-                  <input type="password" name="password" />
-                </p>
-              </div>
-              <div class="form-action">
-                <input type="submit" value="Login" />
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+    <link rel="stylesheet" href="css/pages/login.css" />
 
-    <div class="registerArea">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-            <form method="POST" action="register">
-              <div class="form-fields">
-                <h2>Register</h2>
-                {{#if message}}
-                  <div class="error">{{message}}</div>
-                {{/if}}
-                <p>
-                  <label for="username">Username
-                    <span class="required">*</span></label>
-                  <input type="text" name="username" value="" />
-                </p>
-                <p>
-                  <label for="email">Email
-                    <span class="required">*</span></label>
-                  <input type="text" name="email" value="" placeholder="Your CUHK link email" />
-                </p>
-                <p>
-                  <label>Password <span class="required">*</span></label>
-                  <input type="password" name="password" value="" />
-                </p>
-              </div>
-              <div class="form-action">
-                <input type="submit" value="Register" />
-              </div>
-            </form>
-          </div>
-        </div>
+
+    <div class="loginContainer">
+
+      <div class="loginImage">
+        <img src="img/furnitures.jpg" alt="login image" />
+        <h1>
+          Welcome to CU-Later
+        </h1>
       </div>
+
+      <div class="registerArea">
+        <form method="POST" action="register">
+          <div>
+          <h2>Register</h2><span onclick="document.querySelector('.loginContainer').classList.remove('register');" class="switchPage">OR Login</span>
+          </div>
+
+          {{#if message}}
+            <div class="error">{{message}}</div>
+          {{/if}}
+          <div class="Login-Register-Form-Field">
+            <input type="text" id="username" name="username" class="Login-Register-Form-Input" placeholder="Username" required />
+            <label htmlFor="username" class="Login-Register-Form-Label">
+              Username*
+            </label>
+          </div>
+          <div class="Login-Register-Form-Field">
+            <input type="text" id="email" name="email" class="Login-Register-Form-Input" placeholder="Your CUHK link email" required />
+            <label htmlFor="email" class="Login-Register-Form-Label">
+              Email*
+            </label>
+          </div>
+          <div class="Login-Register-Form-Field">
+            <input type="password" name="password" id="password" class="Login-Register-Form-Input" placeholder="Password" required />
+            <label htmlFor="password" class="Login-Register-Form-Label">
+              Password*
+            </label>
+          </div>
+          <input type="submit" value="Register" class="Login-Register-Form-Button"/>
+        </form>
+      </div>
+
+      <div class="loginArea">
+        <form method="POST" action="login">
+          <div>
+          <h2>Login</h2><span onclick="document.querySelector('.loginContainer').classList.add('register');" class="switchPage">OR Register</span>
+          </div>
+          {{#if message}}
+            <div class="error">{{message}}</div>
+          {{/if}}
+          <div class="Login-Register-Form-Field">
+            <input type="text" id="username" name="username" class="Login-Register-Form-Input" placeholder="Username" required />
+            <label htmlFor="username" class="Login-Register-Form-Label">
+              Username*
+            </label>
+          </div>
+          <div class="Login-Register-Form-Field">
+            <input type="password" name="password" id="password" class="Login-Register-Form-Input" placeholder="Password" required />
+            <label htmlFor="password" class="Login-Register-Form-Label">
+              Password*
+            </label>
+          </div>
+          <input type="submit" value="Login" class="Login-Register-Form-Button"/>
+        </form>
+      </div>
+
+  
+
     </div>
 
     {{> import_footer}}
