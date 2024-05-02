@@ -67,3 +67,11 @@ ul {
 body {
   font-family: "Raleway", sans-serif;
 }
+
+.error {
+  margin: 0;
+}
+
+main {
+  min-height: calc(100vh - 120px);
+}

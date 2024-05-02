@@ -5,6 +5,7 @@ nav {
   gap: 10px;
   position: sticky;
   top: 0;
+  height: 60px;
 }
 
 nav a {
@@ -39,12 +40,24 @@ nav .background {
   z-index: -1;
 }
 
-.headerMenu {
+nav .headerMenu {
   display: flex;
   justify-content: space-around;
   align-items: center;
   background-color: rgba(51, 51, 51, 0.95);
   border-radius: 50px;
   margin: 10px 0;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.02);
+}
+
+.headerMenu .accountItem {
+  display: none;
+}
+
+.headerMenu[data-user="true"] .accountItem {
+  display: block;
+}
+
+.headerMenu[data-user="true"] .loginItem {
+  display: none;
 }
