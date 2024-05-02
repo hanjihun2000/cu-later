@@ -55,14 +55,14 @@ nav .headerMenu {
   box-shadow: 0 0 10px rgba(225, 112, 85, 0.5);
 }
 
-.headerMenu .accountItem {
+.headerMenu .loginItem {
   display: none;
 }
 
-.headerMenu[data-user="true"] .accountItem {
+.headerMenu[data-user="false"] .accountItem {
+  display: none;
+}
+
+.headerMenu[data-user="false"] .loginItem {
   display: block;
-}
-
-.headerMenu[data-user="true"] .loginItem {
-  display: none;
 }

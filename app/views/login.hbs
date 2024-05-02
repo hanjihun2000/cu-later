@@ -1,21 +1,4 @@
 <!--FUNCTION CODE-->
-{{!-- <h2>Login</h2>
-{{#if message}}
-<div class="error">{{ message }}</div>
-{{/if}}
-<form method="POST" action="login">
-	<div>
-		<label for="username">Username:</label>
-		<input type="text" name="username" value="">
-	</div>
-	<div>
-		<label for="password">Password:</label> 
-		<input type="password" name="password" value="">
-	</div>
-	<div>
-		<input type="submit" value="Login">
-	</div>
-</form> --}}
 
 <html class="no-js" lang="">
   <head>
@@ -27,6 +10,9 @@
 		<![endif]-->
 
     {{> import_nav}}
+    <script>
+        document.querySelector(".headerMenu").setAttribute("data-user", "false");
+    </script>
 
     <div class="loginArea">
       <div class="container">

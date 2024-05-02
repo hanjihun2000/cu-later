@@ -68,7 +68,10 @@ app.get("/", function (req, res) {
 app.get("/buy", function (req, res) {
   // check login state
   if (req.session.username === undefined) {
-    res.render("home", { error: "Please login or register first!" });
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
   }
   // find all items ready for sale in database, tag finished will be omitted
   else {
@@ -153,7 +156,10 @@ app.get("/buy/:slug", (req, res) => {
 // sell page for users to post new items
 app.get("/sell", function (req, res) {
   if (req.session.username === undefined) {
-    res.render("home", { error: "Please login or register first!" });
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
   } else {
     res.render("sell");
   }
@@ -214,7 +220,10 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
 // page for user to lend products, similar to sell page for current development purposes
 app.get("/lend", function (req, res) {
   if (req.session.username === undefined) {
-    res.render("home", { error: "Please login or register first!" });
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
   } else {
     res.render("lend");
   }
@@ -271,7 +280,10 @@ app.post("/lend", upload.single("image"), function (req, res) {
 // page for item sharing, similar to buying page for current development purposes
 app.get("/share", function (req, res) {
   if (req.session.username === undefined) {
-    res.render("home", { error: "Please login or register first!" });
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
   } else {
     Item_share.find(
       { status: { $ne: "finished" } },
@@ -335,7 +347,10 @@ app.get("/share/:slug", (req, res) => {
 // personal history page
 app.get("/personal", function (req, res) {
   if (req.session.username === undefined) {
-    res.render("home", { error: "Please login or register first!" });
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
   }
   // find all items user requested, and all other users that requested certain items of this user. will showcase two sections seperately.
   // buyers are able to see updates of requested items, but cannot contact sellers directly.
@@ -488,7 +503,9 @@ app.post("/register", (req, res) => {
 
 // login page for users
 app.get("/login", (req, res) => {
-  res.render("login");
+  if (req.session.username !== undefined) {
+    res.redirect("personal");
+  } else res.render("login");
 });
 
 // validation of login credentials

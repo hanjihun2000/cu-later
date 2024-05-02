@@ -5,13 +5,20 @@
   <body>
 
     {{> import_nav}}
+    <script>
+      if ({{loggedIn}} === false) {
+        document.querySelector(".headerMenu").setAttribute("data-user", "false");
+      }
+    </script>
 
 
     <link rel="stylesheet" href="css/pages/home.css" />
 
 
     <!--LOGIN RESTRICTION-->
-    <p class="error" >{{error}}</p>
+    {{#if error}}
+    <p class="error">{{error}}</p>
+    {{/if}}
 
     <!--slider area start-->
     <div class="slider-area home1">
