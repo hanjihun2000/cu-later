@@ -1,7 +1,10 @@
+/* https://flatuicolors.com/palette/us */
+
 html,
 body {
   height: 100%;
   overscroll-behavior: none;
+  background-color: #dfe6e9;
 }
 .floatleft {
   float: left;
