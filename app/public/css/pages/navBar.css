@@ -29,6 +29,10 @@ nav > div {
   font-weight: bold;
 }
 
+.headerLogo a:hover {
+  color: white;
+}
+
 nav .background {
   content: "";
   display: block;

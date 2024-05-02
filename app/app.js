@@ -462,11 +462,6 @@ app.post("/personal", function (req, res) {
   }
 });
 
-// register page for user
-app.get("/register", (req, res) => {
-  res.render("register");
-});
-
 // take input from user to register new account
 app.post("/register", (req, res) => {
   function success(user) {

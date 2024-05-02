@@ -52,7 +52,7 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: #ec4445;
+  color: rgba(253, 203, 110, 1);
   text-decoration: none;
 }
 a:active,
@@ -76,5 +76,6 @@ body {
 }
 
 main {
+  position: relative;
   min-height: calc(100vh - 120px);
 }
