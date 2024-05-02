@@ -30,6 +30,11 @@ filenames.forEach(function (filename) {
 app.use(express.static("public"));
 app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: false }));
+// TODO: remove the cache control header for production
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
 
 // initialize session to maintain login state
 const sessionOptions = {
