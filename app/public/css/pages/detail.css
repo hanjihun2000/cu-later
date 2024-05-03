@@ -78,7 +78,7 @@ input[type="button"] {
 }
 
 .full-screen {
-  cursor: pointer;
+  cursor: zoom-in;
 }
 
 .full-screen-checkbox:checked ~ .full-screen {
@@ -93,6 +93,7 @@ input[type="button"] {
   z-index: 9999;
   padding: calc(5% + 60px) 5% 5% 5%;
   background-color: rgba(0, 0, 0, 0.8);
+  cursor: zoom-out;
 }
 
 .full-screen-checkbox:checked ~ .full-screen img {
