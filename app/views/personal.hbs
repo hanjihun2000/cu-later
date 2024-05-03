@@ -1,0 +1,117 @@
+
+<!doctype html>
+<html class="no-js" lang="">
+	<head>
+    {{> import_head}}
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+    {{> import_nav}}
+    
+    <link rel="stylesheet" href="css/pages/personal.css" />
+
+
+		<!--LOGIN RESTRICTION-->
+        {{#if message}}
+        <div class="error">{{message}}</div>
+        {{/if}}
+
+
+        <!--START YOUR ITEM AREA-->
+        <h1>Your Item</h1>
+        <div class="wishlist-area">
+            <div class="wishlist-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="product-name"><span class="nobr">Product Name</span></th>
+                            <th class="product-price"><span class="nobr"> Unit Price </span></th>
+                            <th class="product-stock-stauts"><span class="nobr">Requesters</span></th>
+                            <th class="product-name"><span class="nobr">Description</span></th>
+                            <th class="product-add-to-cart"><span class="nobr">Submit</span></th>
+                            <th class="product-add-to-cart"><span class="nobr">Denied</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ol>
+                        {{#each shop}}
+                            <tr>
+                                <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
+                                <td class="product-price"><span class="amount">$ {{price}}</span></td>
+                                <td class="product-stock-status"><span class="wishlist-in-stock">{{requesters}}</span></td>
+                                <td class="product-name">{{description}}</span></td>
+                                <td class="product-add-to-cart">
+                                    <form method="POST" action=""><input type="submit" id = {{id}} name = {{id}} value="Finished">
+                                </td>
+                                <td class="product-add-to-cart">
+                                    <form method="POST" action=""><input type="submit" class="declined" id = {{id}} name = {{id}} value="Denied">
+                                </td>
+                            </tr>
+                        {{/each}}
+                        </ol>
+                        <ol>
+                        {{#each shop2}}
+                            <tr>
+                                <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
+                                <td class="product-price"><span class="amount">$ {{price}}</span></td>
+                                <td class="product-stock-status"><span class="wishlist-in-stock">{{requesters}}</span></td>
+                                <td class="product-name">{{description}}</span></td>
+                                <td class="product-add-to-cart">
+                                    <form method="POST" action=""><input type="submit" id = {{id}} name = {{id}} value="Finished">
+                                </td>
+                                <td class="product-add-to-cart">
+                                    <form method="POST" action=""><input type="submit" id = {{id}} name = {{id}} value="Denied">
+                                </td>
+                            </tr>
+                        {{/each}}
+                        </ol>
+                    </tbody>
+                </table>
+            </div>	
+        </div>
+        <!--END YOUR ITEM AREA-->
+		<!--START REQUESTED ITEM AREA-->
+        <h1>Requested Items</h1>
+        <div class="wishlist-area">
+            <div class="wishlist-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="product-name"><span class="nobr">Product Name</span></th>
+                            <th class="product-price"><span class="nobr">Price</span></th>
+                            <th class="product-stock-stauts"><span class="nobr">Owner</span></th>
+                            <th class="product-name"><span class="nobr">Description</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ol></ol>
+                        {{#each request}}
+                        <tr>
+                            <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
+                            <td class="product-price"><span class="amount">$ {{price}}</span></td>
+                            <td class="product-stock-status"><span class="wishlist-in-stock">{{owner}}</span></td>
+                            <td class="product-name">{{description}}</span></td>
+                        </tr>
+                        </ol>
+                        <ol>
+                        {{/each}}
+                        {{#each request2}}
+                        <tr>
+                            <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
+                            <td class="product-price"><span class="amount">$ {{price}}</span></td>
+                            <td class="product-stock-status"><span class="wishlist-in-stock">{{owner}}</span></td>
+                            <td class="product-name">{{description}}</span></td>
+                        </tr>
+                        {{/each}}
+                        </ol>
+                    </tbody>
+                </table>
+            </div>	
+        </div>
+
+    {{> import_footer}}
+    </body>
+</html>

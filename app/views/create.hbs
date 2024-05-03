@@ -1,0 +1,63 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+    	{{> import_head}}
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+		
+    {{> import_nav}}
+
+    <link rel="stylesheet" href="css/pages/sell.css" />
+
+
+
+		<!--LOGIN RESTRICTION-->
+        {{#if message}}
+        <div class="error">{{message}}</div>
+        {{/if}}
+
+
+        <!--ADD ITEM START-->
+        <div class="shop-header-area">
+            <h1>Create Activity</h1>
+        </div>
+
+        <!-- POST ITEM START -->
+        <div class="checkout-area">
+            <form method="POST" action="create" enctype="multipart/form-data">
+                <div class="Search-Form-Field">
+                    <input type="text" name="title" id="title" class="Search-Form-Input" placeholder="Title" required />
+                    <label for="title" class="Search-Form-Label">
+                        Title
+                    </label>
+                </div>
+                <div class="Search-Form-Field">
+                    <input type="date" data-date="" name="date", id="date" class="Search-Form-Input" data-date-format="DD MMMM YYYY" value="" required>
+                    {{!-- <input type="text" name="price" id="price" class="Search-Form-Input" placeholder="Price" required /> --}}
+                    <label for="price" class="Search-Form-Label">
+                        Date
+                    </label>
+                </div>
+                <div class="Search-Form-Field">
+                    <textarea name="description" id="description" class="Search-Form-Input" placeholder="Description" required ></textarea>
+                    <label for="description" class="Search-Form-Label">
+                        Description
+                    </label>
+                </div>
+                <div class="File-Form-Field">
+                    <input type="file" id="img-upload-input" name="image" class="File-Form-Input" required />
+                    <label for="img-upload-input" class="File-Form-Label">
+                        Upload Image*
+                    </label>
+                </div>
+                <input type="submit" value="Add" class="Search-Form-Button"/>
+            </form>
+        </div>
+        <!-- checkout-area end -->	
+		
+    {{> import_footer}}
+    </body>
+</html>

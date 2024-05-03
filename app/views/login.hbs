@@ -1,0 +1,95 @@
+<!--FUNCTION CODE-->
+
+<html class="no-js" lang="">
+  <head>
+    {{> import_head}}
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+			<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+		<![endif]-->
+
+    {{> import_nav}}
+    <script>
+        document.querySelector(".headerMenu").setAttribute("data-user", "false");
+    </script>
+
+    <link rel="stylesheet" href="css/pages/login.css" />
+    <script src="js/login.js"></script>
+
+
+    <div class="loginContainer {{#if register}}register{{/if}}">
+
+      <div class="loginImage">
+        <img src="img/furnitures.jpg" alt="login image" />
+        <h1>
+          Welcome to CU-Later
+        </h1>
+      </div>
+
+      <div class="registerArea">
+        <form method="POST" action="register">
+          <div>
+          <h2>Register</h2><span onclick="document.querySelector('.loginContainer').classList.remove('register');" class="switchPage">OR Login</span>
+          </div>
+
+          {{#if registerMessage}}
+            <div class="error">{{registerMessage}}</div>
+          {{/if}}
+          <div class="Login-Register-Form-Field">
+            <input type="text" id="username" name="username" class="Login-Register-Form-Input" placeholder="Username" required />
+            <label for="username" class="Login-Register-Form-Label">
+              Username*
+            </label>
+          </div>
+          <div class="Login-Register-Form-Field">
+            <input type="text" id="email" name="email" class="Login-Register-Form-Input" placeholder="Your CUHK link email" required />
+            <label for="email" class="Login-Register-Form-Label">
+              Email*
+            </label>
+          </div>
+          <div class="Login-Register-Form-Field">
+            <input type="password" name="password" id="password" class="Login-Register-Form-Input" placeholder="Password" required />
+            <label for="password" class="Login-Register-Form-Label">
+              Password*
+            </label>
+          </div>
+          <input type="submit" value="Register" class="Login-Register-Form-Button"/>
+        </form>
+      </div>
+
+      <div class="loginArea">
+        <form method="POST" action="login">
+          <div>
+          <h2>Login</h2><span onclick="document.querySelector('.loginContainer').classList.add('register');" class="switchPage">OR Register</span>
+          </div>
+          {{#if loginMessage}}
+            <div class="error">{{loginMessage}}</div>
+          {{/if}}
+          <div class="Login-Register-Form-Field">
+            <input type="text" id="loginUsername" name="username" class="Login-Register-Form-Input" placeholder="Username" required />
+            <label for="loginUsername" class="Login-Register-Form-Label">
+              Username*
+            </label>
+          </div>
+          <div class="Login-Register-Form-Field">
+            <input type="password" name="password" id="loginPassword" class="Login-Register-Form-Input" placeholder="Password" required />
+            <label for="loginPassword" class="Login-Register-Form-Label">
+              Password*
+            </label>
+          </div>
+          <input type="submit" value="Login" class="Login-Register-Form-Button"/>
+          <input type="button" value="Login via CUHK" class="Login-Register-Form-Button" onclick="openCUHKLogin()"/>
+        </form>
+      </div>
+
+      
+
+  
+
+    </div>
+
+    {{> import_footer}}
+  </body>
+
+</html>

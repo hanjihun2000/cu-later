@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  app:
+    image: node:latest
+    container_name: cu-later-app
+    restart: always
+    working_dir: /usr/src/app
+    volumes:
+      - ./app:/usr/src/app
+    environment:
+      - NODE_ENV=production
+      - DB=mongodb://admin:password@db:27017
+      - PORT=80
+      - SSL_PORT=443
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - db
+    command: sh -c "yarn && npm start"
+
+  db:
+    image: mongo:latest
+    container_name: cu-later-db
+    restart: always
+    volumes:
+      - mongodata:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+
+volumes:
+  mongodata:

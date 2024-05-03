@@ -1,0 +1,68 @@
+nav {
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 3fr 8fr 3fr;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  height: 60px;
+  z-index: 997;
+}
+
+nav a {
+  float: left;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 10px 16px;
+  text-decoration: none;
+}
+
+nav > div {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.headerLogo a {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.headerLogo a:hover {
+  color: white;
+}
+
+nav .background {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(225, 112, 85, 1);
+  z-index: -1;
+}
+
+nav .headerMenu {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: rgba(225, 112, 85, 1);
+  border-radius: 50px;
+  margin: 10px 0;
+  box-shadow: 0 0 10px rgba(225, 112, 85, 0.5);
+}
+
+.headerMenu .loginItem {
+  display: none;
+}
+
+.headerMenu[data-user="false"] .accountItem {
+  display: none;
+}
+
+.headerMenu[data-user="false"] .loginItem {
+  display: block;
+}

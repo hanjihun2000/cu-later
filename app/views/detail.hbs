@@ -1,0 +1,77 @@
+<html class="no-js" lang="">
+  <head>
+    {{> import_head}}
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+      <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    {{> import_nav}}
+    <script>
+      if ({{loggedIn}} === false) {
+        document.querySelector(".headerMenu").setAttribute("data-user", "false");
+      }
+    </script>
+
+    <link rel="stylesheet" href="css/pages/detail.css" />
+
+
+
+    <!--LOGIN RESTRICTION-->
+    {{#if message}}
+      <div class="error">{{message}}</div>
+    {{/if}}
+
+
+    <!--product-simple area satrt-->
+    <div class="product-simple-area">
+      <div class="single-product-image">
+        <input
+          type="checkbox"
+          id="imageFullScreen"
+          class="full-screen-checkbox"
+        />
+        <label for="imageFullScreen" class="full-screen">
+            <img
+              src="data:{{shop.img.contentType}};base64,{{shop.img.data}}"
+            />
+        </label>
+      </div>
+      <div class="single-product-info">
+        <h1 class="product_title">{{shop.title}}</h1>
+        <div class="attributes">
+          <div class="price-box">
+            <span class="new-price">${{shop.price}}</span>
+          </div>
+          <div class="stock-status">
+            In stock
+          </div>
+        </div>
+        <div class="short-description">
+          <p>{{shop.description}}</p>
+        </div>
+      </div>
+    </div>
+    <form method="POST" action="">
+          <input
+            type="submit"
+            id={{shop.id}}
+            name={{shop.id}}
+            value="Request Now"
+          />
+          <input
+            type="button"
+            id="back"
+            name="back"
+            onclick="window.history.back();"
+            value="Back"
+          >
+            
+          </input>
+      </form>
+    <!--product-simple area end-->
+    {{> import_footer}}
+
+  </body>
+</html>

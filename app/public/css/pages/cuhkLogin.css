@@ -1,0 +1,92 @@
+.loginArea {
+  height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h2 {
+  margin: 0 0 20px 0;
+}
+
+form {
+  width: 80%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Login-Register-Form-Field:first-child {
+  margin-top: 15px;
+}
+
+.Login-Register-Form-Field {
+  position: relative;
+  margin-bottom: 20px;
+  width: 80%;
+}
+
+.Login-Register-Form-Field input {
+  border: 1px solid #9e9e9a;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+  border-radius: 5px;
+  user-select: none;
+  background: #dfe6e9;
+}
+
+.Login-Register-Form-Field .Login-Register-Form-Label {
+  display: block;
+  position: absolute;
+  top: 16px;
+  left: 10px;
+  width: 80%;
+  text-align: left;
+  padding: 0 8px;
+  font-size: 15px;
+  color: #9e9e9a;
+  background: #dfe6e9;
+  z-index: 1;
+  transition: left 0.1s ease-in-out, top 0.1s ease-in-out,
+    font-size 0.1s ease-in-out, width 0.1s ease-in-out;
+  user-select: none;
+  cursor: text;
+}
+
+.Login-Register-Form-Field input:focus {
+  border: 1px solid #038aff;
+}
+
+.Login-Register-Form-Field input:focus ~ .Login-Register-Form-Label {
+  color: #038aff;
+}
+.Login-Register-Form-Field input:focus ~ .Login-Register-Form-Label,
+.Login-Register-Form-Field
+  input:not(:placeholder-shown)
+  ~ .Login-Register-Form-Label {
+  top: -7.5px;
+  left: 10px;
+  width: fit-content;
+  font-size: 12px;
+}
+
+.Login-Register-Form-Button {
+  background: rgba(225, 112, 85, 1);
+  border-radius: 20px;
+  border: none;
+  padding: 10px 0;
+  width: 75%;
+  margin-top: 5px;
+  color: white;
+  font-size: 16px;
+  transition: background 0.2s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+}
+
+.Login-Register-Form-Button:hover {
+  background: rgba(255, 118, 117, 1);
+}
