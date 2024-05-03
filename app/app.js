@@ -12,6 +12,7 @@ const exphbs = require("express-handlebars");
 var fs = require("fs");
 var hbs = require("hbs");
 var path = require("path");
+const crypto = require("crypto");
 
 // register partials for handlebars
 var partialsDir = __dirname + "/views/partials";
@@ -285,7 +286,6 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
             });
             return;
           }
-          console.log("redirecting to buy page");
           res.redirect("/buy");
         }
       );
@@ -526,8 +526,76 @@ app.get("/register", (req, res) => {
 // login page for users
 app.get("/login", (req, res) => {
   if (req.session.username !== undefined) {
-    res.redirect("personal");
+    res.redirect("/");
   } else res.render("login");
+});
+
+app.get("/cuhkLogin", (req, res) => {
+  res.render("cuhkLogin");
+});
+
+app.post("/cuhkLogin", (req, res) => {
+  // check if the user is a CUHK student
+  try {
+    const username = req.body.username;
+    const validation = /\b1155\d{6}@link.cuhk.edu.hk$/;
+    if (!validation.test(username)) {
+      throw new Error("Invalid CUHK email address!");
+    }
+    const studentNumber = username.split("@")[0];
+    const password = req.body.password;
+
+    const encrypt = (plaintext) => {
+      const password = "e3ded030ce294235047550b8f69f5a28";
+      const iv = "e0b2ea987a832e24";
+      const cipher = crypto.createCipheriv("aes-256-cbc", password, iv);
+      let encrypted = cipher.update(plaintext, "utf8", "base64");
+      encrypted += cipher.final("base64");
+      return encrypted;
+    };
+
+    const xml = `<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><GetTimeTable xmlns="http://tempuri.org/"><asP1>${encrypt(
+      studentNumber
+    )}</asP1><asP2>${encrypt(
+      password
+    )}</asP2><asP3>hk.edu.cuhk.ClassTT</asP3></GetTimeTable></soap:Body></soap:Envelope>`;
+
+    fetch("https://campusapps.itsc.cuhk.edu.hk/store/CLASSSCHD/STT.asmx", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/xml; charset=utf-8",
+        "User-Agent": "ClassTT/2.4 CFNetwork/1333.0.4 Darwin/21.5.0",
+      },
+      body: xml,
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        const jsonData = data.replace(/(<([^>]+)>)/gi, "");
+        const result = JSON.parse(jsonData);
+
+        //  if is empty array, then it is not a valid CUHK student
+        if (result.length === 0) {
+          throw new Error("Invalid CUHK username or password!");
+        }
+
+        auth.startAuthenticatedSession(req, { username: username }, (err) => {
+          if (err) {
+            console.log(err);
+          }
+          // close the window after login
+          res.send(
+            "<script>window.close();</script><h1>Login successful! You can close this window now.</h1>"
+          );
+        });
+      })
+      .catch((error) => {
+        res.render("cuhkLogin", {
+          error: error || "Invalid CUHK username or password!",
+        });
+      });
+  } catch (error) {
+    res.render("cuhkLogin", { error: error });
+  }
 });
 
 // validation of login credentials
