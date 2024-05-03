@@ -1,0 +1,43 @@
+<html class="no-js" lang="">
+  <head>
+    {{> import_head}}
+  </head>
+  <body>
+
+    <link rel="stylesheet" href="css/pages/cuhkLogin.css" />
+
+
+    <!--LOGIN RESTRICTION-->
+    {{#if error}}
+    <p class="error">{{error}}</p>
+    {{/if}}
+
+    <!--slider area start-->
+      <div class="loginArea">
+        <form method="POST" action="cuhkLogin">
+          <div>
+          <h2>CUHK Login</h2>
+          </div>
+          {{#if loginMessage}}
+            <div class="error">{{loginMessage}}</div>
+          {{/if}}
+          <div class="Login-Register-Form-Field">
+            <input type="text" id="loginUsername" name="username" class="Login-Register-Form-Input" placeholder="1155*@link.cuhk.edu.hk" required />
+            <label for="loginUsername" class="Login-Register-Form-Label">
+              CUHK Student Email*
+            </label>
+          </div>
+          <div class="Login-Register-Form-Field">
+            <input type="password" name="password" id="loginPassword" class="Login-Register-Form-Input" placeholder="Password" required />
+            <label for="loginPassword" class="Login-Register-Form-Label">
+              Password*
+            </label>
+          </div>
+          <input type="submit" value="Login" class="Login-Register-Form-Button"/>
+        </form>
+      </div>
+    <!--slider area end-->
+
+    {{> import_footer}}
+  </body>
+</html>
