@@ -15,7 +15,6 @@ const Item_buy = new mongoose.Schema({
     data: Buffer,
     contentType: String,
   },
-  date: { type: Date, default: Date.now },
 });
 
 // activity for promotion
@@ -23,6 +22,7 @@ const Activity = new mongoose.Schema({
   title: String,
   description: String,
   status: String,
+  date: Date,
   // foreign key to reference organizer and participants
   organizer: [{ type: String, ref: "User.username" }],
   participants: [{ type: String, ref: "User.email" }],
@@ -30,8 +30,6 @@ const Activity = new mongoose.Schema({
     data: Buffer,
     contentType: String,
   },
-  date: { type: Date, default: Date.now },
-  deadline: Date,
 });
 
 // user object
@@ -41,7 +39,7 @@ const User = new mongoose.Schema({
   // constraints to make password required
   password: { type: String, unique: true, required: true },
   items_buy: [{ type: String, ref: "Item_buy.title" }],
-  activity: [{ type: String, ref: "Item_share.title" }],
+  activity: [{ type: String, ref: "Activity.title" }],
 });
 
 mongoose.model("Item_buy", Item_buy);

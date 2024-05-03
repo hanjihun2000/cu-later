@@ -4,8 +4,8 @@
   </head>
   <body>
     <!--[if lt IE 8]>
-		  <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-		<![endif]-->
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
 
     {{> import_nav}}
 
@@ -21,7 +21,7 @@
 
     <!--shop header area sart-->
     <div class="shop-header-area">
-      <h1>Buy All Products</h1>
+      <h1>Search All Activities</h1>
     </div>
     <!--shop header area end-->
     <!--shop-area start-->
@@ -30,7 +30,7 @@
         </div>
         <!--shop-gird view-->
         <div class="shop-list-toolbar">
-          <form action="/search/buy" method="GET">
+          <form action="/search/activity" method="GET">
             <div class="Search-Form-Field">
               <input type="text" name="query" id="query" class="Search-Form-Input" placeholder="Search" required />
               <label for="query" class="Search-Form-Label">
@@ -45,7 +45,7 @@
               {{#each searchResults}}
                   <div class="single-product">
                     <div class="product-img">
-                      <a class="b-s-p-img" href="/buy/{{_id}}">
+                      <a class="b-s-p-img" href="/activity/{{_id}}">
                         <img
                           src="data:{{img.contentType}};base64,{{img.data}}"
                         />
@@ -54,20 +54,19 @@
                     <div class="product-block-text">
                       <h3>
                         <div>
-                          <a href="/buy/{{_id}}">{{title}}</a>
-                          <span>${{price}}</span>
+                          <a href="/activity/{{_id}}">{{title}}</a>
                         </div>
                         <p>{{description}}</p>
                       </h3>
                     </div>
-                    <a class="viewMore" href="/buy/{{_id}}"><span>View More</span></a>
+                    <a class="viewMore" href="/activity/{{_id}}"><span>View More</span></a>
                   </div>
               {{/each}}
             {{else}}
               {{#each shop}}
                   <div class="single-product">
                     <div class="product-img">
-                      <a class="b-s-p-img" href="/buy/{{_id}}">
+                      <a class="b-s-p-img" href="/activity/{{_id}}">
                         <img
                           src="data:{{img.contentType}};base64,{{img.data}}"
                         />
@@ -76,14 +75,13 @@
                     <div class="product-block-text">
                       <h3>
                         <div>
-                          <a href="/buy/{{_id}}">{{title}}</a>
-                          <span>${{price}}</span>
+                          <a href="/activity/{{_id}}">{{title}}</a>
                         </div>
                         <p>{{description}}</p>
                       </h3>
                     </div>
                     
-                    <a class="viewMore" href="/buy/{{_id}}"><span>View More</span></a>
+                    <a class="viewMore" href="/activity/{{_id}}"><span>View More</span></a>
                   </div>
               {{/each}}
             {{/if}}
