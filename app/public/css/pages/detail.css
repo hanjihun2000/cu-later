@@ -2,7 +2,7 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 140px);
 }
 
 .single-product-image {

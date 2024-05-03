@@ -139,6 +139,9 @@ form {
   color: #000;
   display: block;
   margin: 10px 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .product-block-text h3 p {
