@@ -252,7 +252,7 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
             });
             return;
           }
-          res.redirect("/");
+          res.redirect("/buy", { loggedIn: true });
         }
       );
     });
