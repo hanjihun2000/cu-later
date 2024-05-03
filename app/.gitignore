@@ -23,4 +23,4 @@ mongodb.pem
 .gcloudignore
 
 # cert
-sslCert/*
+cert/**
