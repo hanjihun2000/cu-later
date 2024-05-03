@@ -44,6 +44,10 @@
   font-weight: bold;
 }
 
+.short-description p {
+  word-wrap: anywhere;
+}
+
 label {
   margin: 0;
 }
