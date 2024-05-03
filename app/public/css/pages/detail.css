@@ -3,7 +3,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: calc(100vh - 120px);
-  padding-bottom: 120px;
 }
 
 .single-product-image {
@@ -54,26 +53,50 @@
 
 label {
   margin: 0;
+  width: 100%;
 }
 
 form {
-  display: flex;
-  gap: 1rem;
-  position: absolute;
-  bottom: 20px;
-  right: 30px;
-  width: fit-content;
-  align-items: center;
+  padding: 20px 40px 10px 0;
+  text-align: right;
 }
 
 input[type="submit"],
-button {
+input[type="button"] {
   color: white;
   border-radius: 20px;
   padding: 10px 15px;
-  display: block;
+  display: inline-block;
   margin: 0 auto;
   font-size: 16px;
   background: rgba(225, 112, 85, 1);
   border: none;
+}
+
+.full-screen-checkbox {
+  display: none;
+}
+
+.full-screen {
+  cursor: pointer;
+}
+
+.full-screen-checkbox:checked ~ .full-screen {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  padding: calc(5% + 60px) 5% 5% 5%;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.full-screen-checkbox:checked ~ .full-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

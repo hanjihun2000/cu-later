@@ -6,7 +6,7 @@ nav {
   position: sticky;
   top: 0;
   height: 60px;
-  z-index: 1000;
+  z-index: 997;
 }
 
 nav a {
