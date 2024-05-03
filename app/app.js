@@ -101,34 +101,34 @@ app.get("/search", function (req, res) {
 // item buying page
 app.get("/buy", function (req, res) {
   // check login state
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  }
-  // find all items ready for sale in database, tag finished will be omitted
-  else {
-    Item_buy.find(
-      { status: { $ne: "finished" } },
-      function (err, varToStoreResult) {
-        if (err) {
-          console.log(err);
-        }
-        let items = varToStoreResult;
-        items = items.map((item) => {
-          // start mapping images
-          if (item.img.data !== undefined) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("buy", { shop: items, loggedIn: true });
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // }
+  // // find all items ready for sale in database, tag finished will be omitted
+  // else {
+  Item_buy.find(
+    { status: { $ne: "finished" } },
+    function (err, varToStoreResult) {
+      if (err) {
+        console.log(err);
       }
-    );
-  }
+      let items = varToStoreResult;
+      items = items.map((item) => {
+        // start mapping images
+        if (item.img.data !== undefined) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
+        }
+        return item;
+      });
+      res.render("buy", { shop: items });
+    }
+  );
+  // }
 });
 
 app.post("/buy", function (req, res) {
@@ -252,7 +252,8 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
             });
             return;
           }
-          res.redirect("/buy", { loggedIn: true });
+          console.log("redirecting to buy page");
+          res.redirect("/buy");
         }
       );
     });
