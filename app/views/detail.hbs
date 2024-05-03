@@ -14,83 +14,52 @@
       }
     </script>
 
+    <link rel="stylesheet" href="css/pages/detail.css" />
+
+
 
     <!--LOGIN RESTRICTION-->
     {{#if message}}
       <div class="error">{{message}}</div>
     {{/if}}
 
-    <!--product header area start-->
-    <div class="product-header-area">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="product-menu">
-              <ul>
-                <li><a href="../">Home</a>
-                  <i class="fa fa-angle-right"></i></li>
-                <li>{{shop.title}}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--product header area end-->
+
     <!--product-simple area satrt-->
     <div class="product-simple-area">
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-12 col-sm-6 col-md-6">
-            <div class="single-product-image">
-              <div class="single-product-tab">
-                <!-- Tab panes -->
-                <div class="tab-content">
-                  <div id="home" class="tab-pane active" role="tabpanel"><img
-                      src="data:{{shop.img.contentType}};base64,{{shop.img.data}}"
-                    /></div>
-                  {{!-- <div id="profile" class="tab-pane" role="tabpanel"><img
-                      src="../img/product/2.jpg"
-                      alt=""
-                    /></div>
-                  <div id="messages" class="tab-pane" role="tabpanel"><img
-                      src="../img/product/3.jpg"
-                      alt=""
-                    /></div>
-                  <div id="settings" class="tab-pane" role="tabpanel"><img
-                      src="../img/product/4.jpg"
-                      alt=""
-                    /></div> --}}
-                </div>
-              </div>
-            </div>
+      <div class="single-product-image">
+          <img
+            src="data:{{shop.img.contentType}};base64,{{shop.img.data}}"
+          />
+      </div>
+      <div class="single-product-info">
+        <h1 class="product_title">{{shop.title}}</h1>
+        <div class="attributes">
+          <div class="price-box">
+            <span class="new-price">${{shop.price}}</span>
           </div>
-          <div class="col-xs-12 col-sm-6 col-md-6">
-            <div class="single-product-info">
-              <h1 class="product_title">{{shop.title}}</h1>
-              <div class="price-box">
-                <span class="new-price">${{shop.price}}</span>
-              </div>
-              <div class="short-description">
-                <p>{{shop.description}}</p>
-              </div>
-              <div class="stock-status">
-                <label>Availability</label>:
-                <strong>In stock</strong>
-              </div>
-              <form method="POST" action="">
-                <div class="request-button">
-                  <input
-                    type="submit"
-                    id={{shop.id}}
-                    name={{shop.id}}
-                    value="request now!"
-                  />
-                </div>
-              </form>
-            </div>
+          <div class="stock-status">
+            In stock
           </div>
         </div>
+        <div class="short-description">
+          <p>{{shop.description}}</p>
+        </div>
+        <form method="POST" action="">
+            <input
+              type="submit"
+              id={{shop.id}}
+              name={{shop.id}}
+              value="Request Now"
+            />
+            <button
+              type="button"
+              id="back"
+              name="back"
+              onclick="window.history.back();"
+            >
+              Back
+            </button>
+        </form>
       </div>
     </div>
     <!--product-simple area end-->
