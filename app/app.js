@@ -4,7 +4,7 @@ const app = express();
 require("./db");
 const mongoose = require("mongoose");
 const Item_buy = mongoose.model("Item_buy");
-const Item_share = mongoose.model("Item_share");
+const Activity = mongoose.model("Activity");
 const User = mongoose.model("User");
 const session = require("express-session");
 const auth = require("./auth.js");
@@ -287,31 +287,11 @@ app.get("/personal", function (req, res) {
               console.log(err);
             }
             const request = varToStoreResult;
-            Item_share.find(
-              { requesters: req.session.username.email, status: "requested" },
-              function (err, varToStoreResult) {
-                if (err) {
-                  console.log(err);
-                }
-                const request2 = varToStoreResult;
-                Item_share.find(
-                  { owner: req.session.username.username, status: "requested" },
-                  function (err, varToStoreResult) {
-                    if (err) {
-                      console.log(err);
-                    }
-                    const items2 = varToStoreResult;
-                    res.render("personal", {
-                      shop: items,
-                      request: request,
-                      shop2: items2,
-                      request2: request2,
-                      loggedIn: true,
-                    });
-                  }
-                );
-              }
-            );
+            res.render("personal", {
+              shop: items,
+              request: request,
+              loggedIn: true,
+            });
           }
         );
       }
