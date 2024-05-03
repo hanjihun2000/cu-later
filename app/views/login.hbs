@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/pages/login.css" />
 
 
-    <div class="loginContainer">
+    <div class="loginContainer {{#if register}}register{{/if}}">
 
       <div class="loginImage">
         <img src="img/furnitures.jpg" alt="login image" />
@@ -32,8 +32,8 @@
           <h2>Register</h2><span onclick="document.querySelector('.loginContainer').classList.remove('register');" class="switchPage">OR Login</span>
           </div>
 
-          {{#if message}}
-            <div class="error">{{message}}</div>
+          {{#if registerMessage}}
+            <div class="error">{{registerMessage}}</div>
           {{/if}}
           <div class="Login-Register-Form-Field">
             <input type="text" id="username" name="username" class="Login-Register-Form-Input" placeholder="Username" required />
@@ -62,8 +62,8 @@
           <div>
           <h2>Login</h2><span onclick="document.querySelector('.loginContainer').classList.add('register');" class="switchPage">OR Register</span>
           </div>
-          {{#if message}}
-            <div class="error">{{message}}</div>
+          {{#if loginMessage}}
+            <div class="error">{{loginMessage}}</div>
           {{/if}}
           <div class="Login-Register-Form-Field">
             <input type="text" id="username" name="username" class="Login-Register-Form-Input" placeholder="Username" required />

@@ -147,3 +147,9 @@ form h2 {
 .switchPage {
   color: #038aff;
 }
+
+form .error {
+  margin: 0 0 10px 0;
+  background-color: transparent;
+  color: rgba(214, 48, 49, 1);
+}

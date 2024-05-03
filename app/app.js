@@ -192,6 +192,11 @@ app.get("/sell", function (req, res) {
       loggedIn: false,
     });
   } else {
+    // create the uploads folder if it does not exist
+    if (!fs.existsSync("uploads")) {
+      fs.mkdirSync("./uploads");
+    }
+
     res.render("sell", { loggedIn: true });
   }
 });
@@ -367,7 +372,7 @@ app.post("/register", (req, res) => {
     });
   }
   function error(obj) {
-    res.render("register", { message: obj.message });
+    res.render("login", { registerMessage: obj.message, register: true });
   }
   // use functions in auth.js to register new user
   auth.register(
@@ -377,6 +382,10 @@ app.post("/register", (req, res) => {
     error,
     success
   );
+});
+
+app.get("/register", (req, res) => {
+  res.render("login", { register: true });
 });
 
 // login page for users
@@ -398,7 +407,7 @@ app.post("/login", (req, res) => {
     });
   }
   function error(obj) {
-    res.render("login", { message: obj.message });
+    res.render("login", { loginMessage: obj.message });
   }
   // use functions in auth.js to check login credentials
   auth.login(req.body.username, req.body.password, error, success);
