@@ -10,6 +10,9 @@
 		
     {{> import_nav}}
 
+    <link rel="stylesheet" href="css/pages/sell.css" />
+
+
 
 		<!--LOGIN RESTRICTION-->
         {{#if message}}
@@ -18,76 +21,39 @@
 
 
         <!--ADD ITEM START-->
-        <div class="my-a-w-title">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="a-w-title">
-                            <h1>Post a New Item</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="shop-header-area">
+            <h1>Sell Product</h1>
         </div>
+
         <!-- POST ITEM START -->
         <div class="checkout-area">
-            <div class="container">
-                <div class="row">
-                    <form method="POST" action="sell" enctype="multipart/form-data">
-                        <div class="col-lg-12 col-md-12">
-                            <div class="checkbox-form">						
-                                <h3>Item Details</h3>
-							</div>
-						</div>
-						<div class="col-lg-6 col-md-6">
-							<div class="checkbox-form">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="checkout-form-list">
-                                            <label>Product Name<span class="required">*</span></label>										
-                                            <input type="text" id="title" name="title" value="">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="checkout-form-list">
-                                            <label>Price<span class="required">*</span></label>										
-                                            <input type="text" id="price" name="price" value="">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="checkout-form-list">
-                                            <label>Description<span class="required">*</span></label>
-                                            <input type="text" id="description" name="description" value="">
-                                        </div>
-                                    </div>
-								</div>
-                            </div>
-                        </div>	
-						<div class="col-md-6">
-							<div class="coupon-accordion">
-								<!-- ACCORDION START -->
-								<h3><span id="showcoupon">Click here to upload your product picture </span></h3>
-								<div id="checkout_coupon" class="coupon-checkout-content">
-									<div class="coupon-info">
-										<p class="checkout-coupon">
-											<input type="file" id="img-upload-input" name="image">
-										</p>
-									</div>
-								</div>
-								<!-- ACCORDION END -->						
-							</div>
-						</div>
-                        <div class="col-lg-6 col-md-6">
-                                <div class="payment-method">
-                                    <div class="add-product-button">
-                                        <input type="submit" value="Add">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+            <form method="POST" action="sell" enctype="multipart/form-data">
+                <div class="Search-Form-Field">
+                    <input type="text" name="title" id="title" class="Search-Form-Input" placeholder="Title" required />
+                    <label for="title" class="Search-Form-Label">
+                        Title
+                    </label>
                 </div>
-            </div>
+                <div class="Search-Form-Field">
+                    <input type="text" name="price" id="price" class="Search-Form-Input" placeholder="Price" required />
+                    <label for="price" class="Search-Form-Label">
+                        Price
+                    </label>
+                </div>
+                <div class="Search-Form-Field">
+                    <textarea name="description" id="description" class="Search-Form-Input" placeholder="Description" required ></textarea>
+                    <label for="description" class="Search-Form-Label">
+                        Description
+                    </label>
+                </div>
+                <div class="File-Form-Field">
+                    <input type="file" id="img-upload-input" name="image" class="File-Form-Input" required />
+                    <label for="img-upload-input" class="File-Form-Label">
+                        Upload Image*
+                    </label>
+                </div>
+                <input type="submit" value="Add" class="Search-Form-Button"/>
+            </form>
         </div>
         <!-- checkout-area end -->	
 		
