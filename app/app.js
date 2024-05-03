@@ -110,7 +110,7 @@ app.get("/search/activity", function (req, res) {
     Activity.find(
       {
         title: { $regex: query, $options: "i" },
-        date: { $lt: new Date() },
+        date: { $gt: new Date() },
       },
       function (err, varToStoreResult) {
         if (err) {
