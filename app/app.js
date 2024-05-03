@@ -11,6 +11,7 @@ const auth = require("./auth.js");
 const exphbs = require("express-handlebars");
 var fs = require("fs");
 var hbs = require("hbs");
+const https = require("https");
 var path = require("path");
 const crypto = require("crypto");
 
@@ -627,7 +628,20 @@ app.get("/logout", (req, res) => {
   });
 });
 
+// support https
+const credentials = {
+  key: fs.readFileSync("sslCert/key.pem"),
+  cert: fs.readFileSync("sslCert/cert.pem"),
+};
+const httpsServer = https.createServer(credentials, app);
+
+// start server
 const PORT = process.env.PORT || 8080;
+const SSL_PORT = process.env.SSL_PORT || 8443;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
+});
+
+httpsServer.listen(SSL_PORT, () => {
+  console.log(`Server listening on port ${SSL_PORT}...`);
 });
