@@ -2,13 +2,16 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: calc(100vh - 120px);
+  min-height: calc(100vh - 120px);
+  padding-bottom: 120px;
 }
 
 .single-product-image {
-  height: 90%;
+  position: sticky;
+  top: 10%;
+  height: calc(90vh - 60px);
   width: 90%;
-  margin: auto;
+  margin: 0 auto;
 }
 
 .single-product-image img {
@@ -18,7 +21,7 @@
 }
 
 .single-product-info {
-  padding: 5%;
+  padding: 5% 5% 0 5%;
 }
 
 .product_title {
@@ -46,6 +49,7 @@
 
 .short-description p {
   word-wrap: anywhere;
+  margin: 0;
 }
 
 label {
