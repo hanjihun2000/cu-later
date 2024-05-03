@@ -146,6 +146,7 @@ form h2 {
 
 .switchPage {
   color: #038aff;
+  cursor: pointer;
 }
 
 form .error {
