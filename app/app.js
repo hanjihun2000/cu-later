@@ -460,7 +460,7 @@ app.post("/cuhkLogin", (req, res) => {
         });
       });
   } catch (error) {
-    res.render("cuhkLogin", { error: `Login Error: ${error}` });
+    res.render("cuhkLogin", { error: error });
   }
 });
 
