@@ -68,7 +68,7 @@ app.get("/", function (req, res) {
   }
 });
 
-app.get("/search", function (req, res) {
+app.get("/search/buy", function (req, res) {
   if (req.session.username === undefined) {
     res.render("home", {
       error: "Please login or register first!",
@@ -93,6 +93,39 @@ app.get("/search", function (req, res) {
           return item;
         });
         res.render("buy", { searchResults: items, loggedIn: true });
+      }
+    );
+  }
+});
+
+app.get("/search/activity", function (req, res) {
+  if (req.session.username === undefined) {
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
+  } else {
+    var query = req.query.query;
+    Activity.find(
+      {
+        title: { $regex: query, $options: "i" },
+        deadline: { $lt: new Date() },
+      },
+      function (err, varToStoreResult) {
+        if (err) {
+          console.log(err);
+        }
+        let items = varToStoreResult;
+        items = items.map((item) => {
+          // start mapping images
+          if (item.img.data !== undefined) {
+            item.img.data = item.img.data.toString("base64"); // convert the data into base64
+            item._id = item._id.toString();
+            item.img = item.img.toObject();
+          }
+          return item;
+        });
+        res.render("activity", { searchResults: items, loggedIn: true });
       }
     );
   }
@@ -254,6 +287,127 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
           }
           console.log("redirecting to buy page");
           res.redirect("/buy");
+        }
+      );
+    });
+  }
+});
+
+// activity page for users to post new activities
+app.get("/activity", function (req, res) {
+  if (req.session.username === undefined) {
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
+  } else {
+    Activity.find(
+      { date: { $gt: new Date() } },
+      function (err, varToStoreResult) {
+        if (err) {
+          console.log(err);
+        }
+        let items = varToStoreResult;
+        items = items.map((item) => {
+          // start mapping images
+          if (item.img.data !== undefined) {
+            item.img.data = item.img.data.toString("base64"); // convert the data into base64
+            item._id = item._id.toString();
+            item.img = item.img.toObject();
+          }
+          return item;
+        });
+        res.render("activity", { shop: items });
+      }
+    );
+  }
+});
+
+// activity detail page
+app.get("/activity/:id", (req, res) => {
+  let id = req.params.id;
+  const objectId = mongoose.Types.ObjectId(id);
+  Activity.find({ _id: objectId }, function (err, result) {
+    if (err) {
+      console.log(err);
+    }
+    let item = result[0];
+    item.deadline = item.date.toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    if (item.img.data !== undefined) {
+      item.img.data = item.img.data.toString("base64"); // convert the data into base64
+      item.img = item.img.toObject();
+    }
+    res.render("content", { shop: item, loggedIn: true });
+  });
+});
+
+// create form for request botton of an activity, this is to easily digest which user requested from session inputs for reference
+app.get("/create", function (req, res) {
+  if (req.session.username === undefined) {
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
+  } else {
+    // create the uploads folder if it does not exist
+    if (!fs.existsSync("uploads")) {
+      fs.mkdirSync("./uploads");
+    }
+    res.render("create", { loggedIn: true });
+  }
+});
+
+app.post("/create", upload.single("image"), function (req, res, next) {
+  // input validations
+  if (
+    typeof req.body.title !== "string" ||
+    typeof req.body.description !== "string" ||
+    !req.session.username ||
+    typeof req.session.username.username !== "string"
+  ) {
+    console.log("Debug!");
+    res.render("create", { error: "Invalid input!", loggedIn: true });
+  } else {
+    new Activity({
+      title: req.body.title,
+      description: req.body.description,
+      organizer: req.session.username.username,
+      date: req.body.date,
+      img: {
+        data: fs.readFileSync("./uploads/" + req.file.filename),
+        contentType: req.file.mimetype,
+      },
+      status: "posted",
+      updated_at: Date.now(),
+    }).save(function (err, Item_sale, count) {
+      if (err) {
+        res.render("create", { error: "Error saving item!", loggedIn: true });
+        return;
+      }
+      // update user information by adding new product in place
+      User.findOneAndUpdate(
+        { username: req.session.username.username },
+        {
+          $push: {
+            activity: req.body.title,
+          },
+        },
+        { new: true },
+        (err, doc) => {
+          if (err) {
+            res.render("create", {
+              error: "Error updating user information!",
+              loggedIn: true,
+            });
+            return;
+          }
+          console.log("redirecting to activity page");
+          res.redirect("/activity");
         }
       );
     });
