@@ -66,3 +66,118 @@ nav .headerMenu {
 .headerMenu[data-user="false"] .loginItem {
   display: block;
 }
+
+.hiddenCheckbox,
+.hamburger {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(225, 112, 85, 1);
+  }
+
+  nav .headerLogo a {
+    display: none;
+  }
+
+  nav .headerLogo::after {
+    content: "CU-Later";
+    font-size: 1rem;
+    font-weight: bold;
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 10px 16px;
+    text-decoration: none;
+  }
+
+  nav .headerMenu {
+    position: fixed;
+    background: rgba(255, 118, 117, 1);
+    top: 60px;
+    left: 0;
+    height: calc(100vh - 60px);
+    width: 100%;
+    flex-direction: column;
+    border-radius: 0;
+    margin: 0;
+    justify-content: flex-start;
+    align-items: flex-start;
+    transform: translateX(100%);
+    transition: transform 0.5s;
+  }
+
+  nav .headerMenu li {
+    border-bottom: 1px solid white;
+    padding: 5px 0;
+    width: 100%;
+  }
+
+  nav .headerMenu li:last-child {
+    border-bottom: none;
+  }
+
+  nav .headerPlaceholder {
+    display: none;
+  }
+
+  nav .background {
+    display: none;
+  }
+
+  .hamburger {
+    content: "";
+    float: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    -webkit-user-select: none;
+    user-select: none;
+    margin: 0;
+  }
+
+  .hamburger::before,
+  .hamburger .bar,
+  .hamburger::after {
+    appearance: none;
+    display: block;
+    content: "";
+    border-bottom: 2.5px solid #fff;
+    width: 30px;
+    height: 0px;
+    margin: 3px;
+    transition: opacity 0.6s;
+  }
+
+  .hamburger::before {
+    transition: transform 0.9s;
+  }
+
+  .hamburger::after {
+    transition: transform 0.6s;
+  }
+
+  .hiddenCheckbox:checked ~ .hamburger .bar {
+    opacity: 0;
+  }
+
+  .hiddenCheckbox:checked ~ .hamburger::before {
+    transform: translate(0px, 8px) rotate(225deg);
+  }
+
+  .hiddenCheckbox:checked ~ .hamburger::after {
+    transform: translate(0px, -8px) rotate(-225deg);
+  }
+
+  .hiddenCheckbox:checked ~ .headerMenu {
+    transform: translateX(0);
+  }
+}
