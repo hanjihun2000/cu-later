@@ -286,6 +286,9 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
     })
       .save() // save() returns a promise
       .then((item) => {
+        // delete the image from the uploads folder
+        fs.unlinkSync("./uploads/" + req.file.filename);
+
         // Handle successful save
         // update user information by adding new product in place
         return User.findOneAndUpdate(
@@ -410,6 +413,9 @@ app.post("/create", upload.single("image"), function (req, res, next) {
     })
       .save() // save() returns a promise
       .then((activity) => {
+        // delete the image from the uploads folder
+        fs.unlinkSync("./uploads/" + req.file.filename);
+
         // Handle successful save
         // update user information by adding new activity
         return User.findOneAndUpdate(
