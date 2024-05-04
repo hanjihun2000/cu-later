@@ -99,7 +99,6 @@ function startAuthenticatedSession(
   callback,
   attribute = { type: "normal" }
 ) {
-  console.log("Starting session for user: ", user);
   req.session.regenerate((err) => {
     if (!err) {
       req.session.user = user;

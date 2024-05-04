@@ -129,6 +129,7 @@ form {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
 }
 
 .product-block-text h3 span {
