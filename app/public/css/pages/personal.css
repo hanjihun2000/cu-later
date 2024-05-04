@@ -1,0 +1,73 @@
+h1 {
+  padding: 10px 20px;
+  margin-top: 20px;
+}
+
+.wishlist-area {
+  padding: 0 20px;
+}
+
+.wishlist-area table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  table-layout: fixed;
+  margin-bottom: 30px;
+}
+
+.wishlist-area table th {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  background-color: rgba(0, 184, 148, 1);
+}
+
+.wishlist-area table tr {
+  background: rgba(0, 184, 148, 0.6);
+}
+
+.wishlist-area table tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.wishlist-area table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  word-wrap: break-word;
+}
+
+.wishlist-area table td img {
+  width: 100px;
+}
+
+.wishlist-area table td a {
+  color: #333;
+}
+
+.wishlist-area table td a:hover {
+  color: #f00;
+}
+
+.wishlist-area table td button,
+.wishlist-area table td input[type="submit"] {
+  padding: 5px 10px;
+  background-color: rgba(250, 177, 160, 1);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.wishlist-area table td input[type="submit"].declined {
+  background-color: rgba(214, 48, 49, 1);
+}
+
+.wishlist-area table th,
+.wishlist-area table .product-name,
+.wishlist-area table .product-price,
+.wishlist-area table .product-add-to-cart {
+  text-align: center;
+}

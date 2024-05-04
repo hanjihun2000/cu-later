@@ -8,6 +8,11 @@
 		<![endif]-->
 
     {{> import_nav}}
+    <script>
+      if ({{loggedIn}} === false) {
+        document.querySelector(".headerMenu").setAttribute("data-user", "false");
+      }
+    </script>
 
     <link rel="stylesheet" href="css/pages/buy.css" />
 

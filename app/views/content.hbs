@@ -27,9 +27,16 @@
     <!--product-simple area satrt-->
     <div class="product-simple-area">
       <div class="single-product-image">
-          <img
-            src="data:{{shop.img.contentType}};base64,{{shop.img.data}}"
-          />
+        <input
+          type="checkbox"
+          id="imageFullScreen"
+          class="full-screen-checkbox"
+        />
+        <label for="imageFullScreen" class="full-screen">
+            <img
+              src="data:{{shop.img.contentType}};base64,{{shop.img.data}}"
+            />
+        </label>
       </div>
       <div class="single-product-info">
         <h1 class="product_title">{{shop.title}}</h1>
@@ -51,14 +58,13 @@
               name={{shop.id}}
               value="Request Now"
             /> --}}
-            <button
-              type="button"
-              id="back"
-              name="back"
-              onclick="window.history.back();"
-            >
-              Back
-            </button>
+            <input
+            type="button"
+            id="back"
+            name="back"
+            onclick="window.history.back();"
+            value="Back"
+          >
         </form>
       </div>
     </div>

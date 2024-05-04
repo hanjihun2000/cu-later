@@ -21,3 +21,6 @@ publicAssets/*.psd
 mongodb.pem
 .env
 .gcloudignore
+
+# cert
+cert/**

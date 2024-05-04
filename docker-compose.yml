@@ -11,8 +11,11 @@ services:
     environment:
       - NODE_ENV=production
       - DB=mongodb://admin:password@db:27017
+      - PORT=80
+      - SSL_PORT=443
     ports:
-      - "8080:8080"
+      - "80:80"
+      - "443:443"
     depends_on:
       - db
     command: sh -c "yarn && npm start"
