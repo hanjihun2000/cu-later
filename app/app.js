@@ -179,6 +179,13 @@ app.post("/buy", function (req, res) {
 });
 
 app.get("/buy/:id", (req, res) => {
+  if (req.session.username === undefined) {
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
+  }
+
   let id = req.params.id;
   const objectId = new mongoose.Types.ObjectId(id);
   Item_buy.findOne({ _id: objectId })
@@ -186,6 +193,12 @@ app.get("/buy/:id", (req, res) => {
       if (item && item.img && item.img.data) {
         item.img.data = item.img.data.toString("base64"); // convert the data into base64
         item.img = item.img.toObject();
+      }
+      if (!item) {
+        res.render("home", {
+          error: "Item not found!",
+          loggedIn: req.session.username !== undefined,
+        });
       }
       res.render("detail", { shop: item, loggedIn: true });
     })
