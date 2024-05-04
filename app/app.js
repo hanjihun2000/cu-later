@@ -9,10 +9,13 @@ const User = mongoose.model("User");
 const session = require("express-session");
 const auth = require("./auth.js");
 const exphbs = require("express-handlebars");
+const cors = require("cors");
+const { sendNotification } = require("./push_helper");
 var fs = require("fs");
 var hbs = require("hbs");
 const https = require("https");
 var path = require("path");
+var bodyParser = require("body-parser");
 const crypto = require("crypto");
 
 // register partials for handlebars
@@ -30,8 +33,20 @@ filenames.forEach(function (filename) {
 
 // use public folder and handlebars engine
 app.use(express.static("public"));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: false }));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+app.use(bodyParser.json());
+app.disable("x-powered-by");
 // TODO: remove the cache control header for production
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store");
@@ -661,6 +676,48 @@ app.get("/logout", (req, res) => {
     }
     res.redirect("/login");
   });
+});
+
+app.post(`/save-subscription`, async (req, res) => {
+  try {
+    const subscription = JSON.stringify(req.body);
+    const user = await User.findOne({ email: req.session.user.email });
+    user.subscription.push(JSON.parse(subscription));
+    await user.save();
+    res.status(201).json({ message: "Subscription Successful" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post(`/send-notification`, async (req, res) => {
+  try {
+    const { id } = req.body;
+    const sub = await models.subscriptions.findOne({ where: { id } });
+    const message = {
+      body: "Elon Musk sent you a friend request",
+      icon: "https://media.npr.org/assets/img/2022/06/01/ap22146727679490-6b4aeaa7fd9c9b23d41bbdf9711ba54ba1e7b3ae-s800-c85.webp",
+      data: {
+        requestId: "1234",
+        username: "elonmusk",
+      },
+      actions: [
+        {
+          action: "accept",
+          title: "Accept",
+        },
+        {
+          action: "view_profile",
+          title: "View Profile",
+        },
+      ],
+      tag: "friend_request",
+    };
+    await sendNotification(sub.subsription, message);
+    res.json({ message: "message sent" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // clear the uploaded image

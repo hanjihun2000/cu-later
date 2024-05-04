@@ -40,6 +40,16 @@ const User = new mongoose.Schema({
   password: { type: String, unique: true, required: true },
   items_buy: [{ type: String, ref: "Item_buy.title" }],
   activity: [{ type: String, ref: "Activity.title" }],
+  subscription: [
+    {
+      endpoint: String,
+      expirationTime: String,
+      keys: {
+        p256dh: String,
+        auth: String,
+      },
+    },
+  ],
 });
 
 mongoose.model("Item_buy", Item_buy);
