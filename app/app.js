@@ -653,6 +653,11 @@ app.get("/logout", (req, res) => {
   });
 });
 
+// clear the uploaded image
+fs.readdirSync("./uploads").forEach((file) => {
+  fs.unlinkSync(path.join("./uploads", file));
+});
+
 // start server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
