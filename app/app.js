@@ -189,10 +189,7 @@ app.post("/buy", function (req, res) {
 
 app.get("/buy/:id", (req, res) => {
   if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
+    res.redirect("/login");
   }
 
   let id = req.params.id;
@@ -347,6 +344,10 @@ app.get("/activity", function (req, res) {
 
 // activity detail page
 app.get("/activity/:id", (req, res) => {
+  if (req.session.username === undefined) {
+    res.redirect("/login");
+  }
+
   let id = req.params.id;
   const objectId = new mongoose.Types.ObjectId(id);
   Activity.findOne({ _id: objectId })
