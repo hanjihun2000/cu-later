@@ -28,7 +28,7 @@
                     <thead>
                         <tr>
                             <th class="product-name"><span class="nobr">Product Name</span></th>
-                            <th class="product-price"><span class="nobr"> Unit Price </span></th>
+                            <th class="product-price"><span class="nobr">Unit Price</span></th>
                             <th class="product-stock-stauts"><span class="nobr">Requesters</span></th>
                             <th class="product-name"><span class="nobr">Description</span></th>
                             <th class="product-add-to-cart"><span class="nobr">Submit</span></th>
@@ -39,15 +39,33 @@
                         <ol>
                         {{#each shop}}
                             <tr>
-                                <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
-                                <td class="product-price"><span class="amount">$ {{price}}</span></td>
-                                <td class="product-stock-status"><span class="wishlist-in-stock">{{requesters}}</span></td>
-                                <td class="product-desc">{{description}}</span></td>
-                                <td class="product-add-to-cart">
-                                    <form method="POST" action=""><input type="submit" id = {{id}} name = {{id}} value="Finished">
+                                <td class="product-name">
+                                    <span class="title">Product Name</span>
+                                    <a href="/buy/{{id}}">{{title}}</a>
+                                </td>
+                                <td class="product-price">
+                                    <span class="title">Unit Price</span>
+                                    <span class="amount">$ {{price}}</span>
+                                </td>
+                                <td class="product-stock-status">
+                                    <span class="title">Requesters</span>
+                                    <span class="wishlist-in-stock">{{requesters}}</span>
+                                </td>
+                                <td class="product-desc">
+                                    <span class="title">Description</span>
+                                    <span class="nobr">{{description}}</span>
                                 </td>
                                 <td class="product-add-to-cart">
-                                    <form method="POST" action=""><input type="submit" class="declined" id = {{id}} name = {{id}} value="Denied">
+                                    <span class="title">Submit</span>
+                                    <form method="POST" action="">
+                                        <input type="submit" id = {{id}} name = {{id}} value="Finished">
+                                    </form>
+                                </td>
+                                <td class="product-add-to-cart">
+                                    <span class="title">Denied</span>
+                                    <form method="POST" action="">
+                                        <input type="submit" class="declined" id = {{id}} name = {{id}} value="Denied">
+                                    </form>
                                 </td>
                             </tr>
                         {{/each}}
@@ -55,15 +73,33 @@
                         <ol>
                         {{#each shop2}}
                             <tr>
-                                <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
-                                <td class="product-price"><span class="amount">$ {{price}}</span></td>
-                                <td class="product-stock-status"><span class="wishlist-in-stock">{{requesters}}</span></td>
-                                <td class="product-desc">{{description}}</span></td>
-                                <td class="product-add-to-cart">
-                                    <form method="POST" action=""><input type="submit" id = {{id}} name = {{id}} value="Finished">
+                                <td class="product-name">
+                                    <span class="title">Product Name</span>
+                                    <a href="/buy/{{id}}">{{title}}</a>
+                                </td>
+                                <td class="product-price">
+                                    <span class="title">Unit Price</span>
+                                    <span class="amount">$ {{price}}</span>
+                                </td>
+                                <td class="product-stock-status">
+                                    <span class="title">Requesters</span>
+                                    <span class="wishlist-in-stock">{{requesters}}</span>
+                                </td>
+                                <td class="product-desc">
+                                    <span class="title">Description</span>
+                                    <span class="nobr">{{description}}</span>
                                 </td>
                                 <td class="product-add-to-cart">
-                                    <form method="POST" action=""><input type="submit" id = {{id}} name = {{id}} value="Denied">
+                                    <span class="title">Submit</span>
+                                    <form method="POST" action="">
+                                        <input type="submit" id = {{id}} name = {{id}} value="Finished">
+                                    </form>
+                                </td>
+                                <td class="product-add-to-cart">
+                                    <span class="title">Denied</span>
+                                    <form method="POST" action="">
+                                        <input type="submit" id = {{id}} name = {{id}} value="Denied">
+                                    </form>
                                 </td>
                             </tr>
                         {{/each}}
@@ -90,20 +126,44 @@
                         <ol></ol>
                         {{#each request}}
                         <tr>
-                            <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
-                            <td class="product-price"><span class="amount">$ {{price}}</span></td>
-                            <td class="product-stock-status"><span class="wishlist-in-stock">{{owner}}</span></td>
-                            <td class="product-desc">{{description}}</span></td>
+                            <td class="product-name">
+                                <span class="title">Product Name</span>
+                                <a href="/buy/{{id}}">{{title}}</a>
+                            </td>
+                            <td class="product-price">
+                                <span class="title">Price</span>
+                                <span class="amount">$ {{price}}</span>
+                            </td>
+                            <td class="product-stock-status">
+                                <span class="title">Owner</span>
+                                <span class="wishlist-in-stock">{{owner}}</span>
+                            </td>
+                            <td class="product-desc">
+                                <span class="title">Description</span>
+                                <span class="nobr">{{description}}</span>
+                            </td>
                         </tr>
                         </ol>
                         <ol>
                         {{/each}}
                         {{#each request2}}
                         <tr>
-                            <td class="product-name"><a href="/buy/{{id}}">{{title}}</a></td>
-                            <td class="product-price"><span class="amount">$ {{price}}</span></td>
-                            <td class="product-stock-status"><span class="wishlist-in-stock">{{owner}}</span></td>
-                            <td class="product-name">{{description}}</span></td>
+                            <td class="product-name">
+                                <span class="title">Product Name</span>
+                                <a href="/buy/{{id}}">{{title}}</a>
+                            </td>
+                            <td class="product-price">
+                                <span class="title">Price</span>
+                                <span class="amount">$ {{price}}</span>
+                            </td>
+                            <td class="product-stock-status">
+                                <span class="title">Owner</span>
+                                <span class="wishlist-in-stock">{{owner}}</span>
+                            </td>
+                            <td class="product-name">
+                                <span class="title">Description</span>
+                                <span class="nobr">{{description}}</span>
+                            </td>
                         </tr>
                         {{/each}}
                         </ol>
