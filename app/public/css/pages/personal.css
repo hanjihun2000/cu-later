@@ -68,6 +68,7 @@ h1 {
 .wishlist-area table th,
 .wishlist-area table .product-name,
 .wishlist-area table .product-price,
-.wishlist-area table .product-add-to-cart {
+.wishlist-area table .product-add-to-cart,
+.wishlist-area table .product-stock-status {
   text-align: center;
 }

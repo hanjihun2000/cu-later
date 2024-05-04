@@ -85,10 +85,17 @@ function logout(req, callback) {
 }
 
 // create session with user logged in
-function startAuthenticatedSession(req, user, callback) {
+function startAuthenticatedSession(
+  req,
+  user,
+  callback,
+  attribute = { type: "normal" }
+) {
+  console.log("Starting session for user: ", user);
   req.session.regenerate((err) => {
     if (!err) {
-      req.session.username = user;
+      req.session.user = user;
+      req.session.type = attribute.type;
       callback();
     } else {
       callback(err);
