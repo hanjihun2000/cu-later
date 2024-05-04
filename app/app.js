@@ -71,34 +71,37 @@ app.get("/", function (req, res) {
 });
 
 app.get("/search/buy", function (req, res) {
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  } else {
-    var query = req.query.query;
-    Item_buy.find({
-      title: { $regex: query, $options: "i" },
-      status: { $ne: "finished" },
-    })
-      .then((varToStoreResult) => {
-        let items = varToStoreResult.map((item) => {
-          // start mapping images
-          if (item.img && item.img.data) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("buy", { searchResults: items, loggedIn: true });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("An error occurred while fetching the data");
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // } else {
+  var query = req.query.query;
+  Item_buy.find({
+    title: { $regex: query, $options: "i" },
+    status: { $ne: "finished" },
+  })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        // start mapping images
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
+        }
+        return item;
       });
-  }
+      res.render("buy", {
+        searchResults: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 app.get("/search/activity", function (req, res) {
@@ -135,31 +138,34 @@ app.get("/search/activity", function (req, res) {
 // item buying page
 app.get("/buy", function (req, res) {
   // check login state
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  }
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // }
   // find all items ready for sale in database, tag finished will be omitted
-  else {
-    Item_buy.find({ status: { $ne: "finished" } })
-      .then((varToStoreResult) => {
-        let items = varToStoreResult.map((item) => {
-          if (item.img && item.img.data) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("buy", { shop: items });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("An error occurred while fetching the data");
+  // else {
+  Item_buy.find({ status: { $ne: "finished" } })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
+        }
+        return item;
       });
-  }
+      res.render("buy", {
+        shop: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 app.post("/buy", function (req, res) {
@@ -305,29 +311,32 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
 
 // activity page for users to post new activities
 app.get("/activity", function (req, res) {
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  } else {
-    Activity.find({ date: { $gt: new Date() } })
-      .then((varToStoreResult) => {
-        let items = varToStoreResult.map((item) => {
-          if (item.img && item.img.data) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("activity", { shop: items });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("An error occurred while fetching the data");
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // } else {
+  Activity.find({ date: { $gt: new Date() } })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
+        }
+        return item;
       });
-  }
+      res.render("activity", {
+        shop: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 // activity detail page
