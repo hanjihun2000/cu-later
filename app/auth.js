@@ -12,6 +12,14 @@ function register(username, email, password, errorCallback, successCallback) {
     errorCallback({ message: "EMAIL IS NOT A VALID CUHK EMAIL" });
     return;
   }
+
+  const emailValidation = /\b\w+@\w+\.\w+/;
+  if (username.match(emailValidation)) {
+    console.log("Username is an email address!");
+    errorCallback({ message: "USERNAME IS AN EMAIL ADDRESS" });
+    return;
+  }
+
   // check if user already exists
   User.findOne({ username: username })
     .then((result) => {
