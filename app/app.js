@@ -105,34 +105,37 @@ app.get("/search/buy", function (req, res) {
 });
 
 app.get("/search/activity", function (req, res) {
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  } else {
-    var query = req.query.query;
-    Activity.find({
-      title: { $regex: query, $options: "i" },
-      date: { $gt: new Date() },
-    })
-      .then((varToStoreResult) => {
-        let items = varToStoreResult.map((item) => {
-          // start mapping images
-          if (item.img && item.img.data) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("activity", { searchResults: items, loggedIn: true });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("An error occurred while fetching the data");
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // } else {
+  var query = req.query.query;
+  Activity.find({
+    title: { $regex: query, $options: "i" },
+    date: { $gt: new Date() },
+  })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        // start mapping images
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
+        }
+        return item;
       });
-  }
+      res.render("activity", {
+        searchResults: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 // item buying page
