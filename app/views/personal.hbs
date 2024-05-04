@@ -12,12 +12,32 @@
     {{> import_nav}}
     
     <link rel="stylesheet" href="css/pages/personal.css" />
+    <script src="js/personal.js" defer></script>
+
 
 
 		<!--LOGIN RESTRICTION-->
         {{#if message}}
         <div class="error">{{message}}</div>
         {{/if}}
+
+        <h1>Your Item</h1>
+        <div class="preference-area">
+            <div class="select-block push-select">
+                <p>Enable Push Message</p>
+                <label class="switch">
+                    <input type="checkbox" id="push">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="select-block">
+                <p>Enable Email</p>
+                <label class="switch">
+                    <input type="checkbox" id="email">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
 
 
         <!--START YOUR ITEM AREA-->

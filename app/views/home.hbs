@@ -60,21 +60,6 @@
     </div>
     <!--slider area end-->
 
-    <button class="notify">Notify Me</button>
-    <script>
-      document.querySelector(".notify").addEventListener("click", async () => {
-        if(!("Notification" in window)){
-          window.alert("This browser does not support desktop notification");
-        }
-        Notification.requestPermission().then(async (Permission)=>{
-          const sw = await registerServiceWorker();
-          sw.showNotification("CU-LATER", {
-            body: "You have enabled push notification",
-          });
-        });
-      });
-    </script>
-
     {{> import_footer}}
   </body>
 </html>
