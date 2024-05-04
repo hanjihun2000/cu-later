@@ -11,6 +11,7 @@ const auth = require("./auth.js");
 const exphbs = require("express-handlebars");
 var fs = require("fs");
 var hbs = require("hbs");
+const https = require("https");
 var path = require("path");
 const crypto = require("crypto");
 
@@ -174,16 +175,16 @@ app.post("/buy", function (req, res) {
   key = Object.keys(req.body)[0];
   Item_buy.findOneAndUpdate(
     { _id: key },
-    {
-      $set: { status: "requested" },
-    },
-    { upsert: true },
-    (err, doc) => {
-      if (err) {
-        console.log("Something wrong when updating data!");
-      }
-    }
-  );
+    { $set: { status: "requested" } },
+    { upsert: true, new: true } // 'new: true' to return the document after update if you need it
+  )
+    .then((doc) => {
+      // Handle the updated document, if needed
+      console.log("Update successful:", doc);
+    })
+    .catch((err) => {
+      console.log("Something wrong when updating data!", err);
+    });
 });
 
 app.get("/buy/:id", (req, res) => {
@@ -219,19 +220,18 @@ app.post("/buy/:id", function (req, res) {
   Item_buy.findOneAndUpdate(
     { _id: key },
     {
-      // update item information by adding new requests
       $set: { status: "requested" },
       $push: { requesters: req.session.user.email },
     },
-    { upsert: true },
-    (err, doc) => {
-      if (err) {
-        console.log("Something wrong when updating data!");
-      } else {
-        res.redirect("/personal");
-      }
-    }
-  );
+    { upsert: true, new: true } // new: true to get the updated document in the response
+  )
+    .then((doc) => {
+      res.redirect("/personal");
+    })
+    .catch((err) => {
+      console.log("Something wrong when updating data!", err);
+      res.status(500).send("Failed to update data");
+    });
 });
 
 // sell page for users to post new items
@@ -349,24 +349,28 @@ app.get("/activity/:id", (req, res) => {
   }
 
   let id = req.params.id;
-  const objectId = mongoose.Types.ObjectId(id);
-  Activity.find({ _id: objectId }, function (err, result) {
-    if (err) {
+  const objectId = new mongoose.Types.ObjectId(id);
+  Activity.findOne({ _id: objectId })
+    .then((item) => {
+      if (!item) {
+        throw new Error("Activity not found");
+      }
+      item.deadline = item.date.toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      if (item.img && item.img.data) {
+        item.img.data = item.img.data.toString("base64"); // convert the data into base64
+        item.img = item.img.toObject();
+      }
+      res.render("content", { shop: item, loggedIn: true });
+    })
+    .catch((err) => {
       console.log(err);
-    }
-    let item = result[0];
-    item.deadline = item.date.toLocaleDateString("en-US", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+      res.status(500).send("An error occurred while fetching the data");
     });
-    if (item.img.data !== undefined) {
-      item.img.data = item.img.data.toString("base64"); // convert the data into base64
-      item.img = item.img.toObject();
-    }
-    res.render("content", { shop: item, loggedIn: true });
-  });
 });
 
 // create form for request botton of an activity, this is to easily digest which user requested from session inputs for reference
@@ -489,16 +493,15 @@ app.post("/personal", function (req, res) {
       {
         $set: { status: result, requesters: [] },
       },
-      { upsert: true },
-      (err, doc) => {
-        if (err) {
-          console.log("Something wrong when updating data!");
-        } else {
-          console.log(doc);
-          res.redirect("/personal");
-        }
-      }
-    );
+      { upsert: true, new: true }
+    )
+      .then((doc) => {
+        console.log(doc);
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+      });
   } else {
     // remove all requesters from list, transaction is denied and item is reposted for requests
     result = "posted";
@@ -508,15 +511,14 @@ app.post("/personal", function (req, res) {
       {
         $set: { status: result, requesters: [] },
       },
-      { upsert: true },
-      (err, doc) => {
-        if (err) {
-          console.log("Something wrong when updating data!");
-        } else {
-          res.redirect("/personal");
-        }
-      }
-    );
+      { upsert: true, new: true }
+    )
+      .then((doc) => {
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+      });
   }
 });
 
@@ -672,3 +674,18 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
+
+// support https
+try {
+  const credentials = {
+    key: fs.readFileSync(process.env.SSL_KEY || "/etc/secrets/key.pem"),
+    cert: fs.readFileSync(process.env.SSL_CERT || "/etc/secrets/cert.pem"),
+  };
+  const httpsServer = https.createServer(credentials, app);
+  const SSL_PORT = process.env.SSL_PORT || 8443;
+  httpsServer.listen(SSL_PORT, () => {
+    console.log(`Server listening on port ${SSL_PORT}...`);
+  });
+} catch (err) {
+  console.log("HTTPS not available", err);
+}
