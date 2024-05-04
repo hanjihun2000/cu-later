@@ -154,3 +154,33 @@ form .error {
   background-color: transparent;
   color: rgba(214, 48, 49, 1);
 }
+
+@media (max-width: 768px) {
+  .loginContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .loginContainer .loginImage {
+    display: none;
+  }
+
+  .loginContainer .loginArea {
+    width: 100%;
+  }
+
+  .loginContainer .registerArea {
+    width: 100%;
+  }
+
+  .loginContainer .registerArea {
+    display: none;
+  }
+
+  .loginContainer.register .registerArea {
+    display: block;
+  }
+
+  .loginContainer.register .loginArea {
+    display: none;
+  }
+}

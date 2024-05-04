@@ -12,6 +12,14 @@ function register(username, email, password, errorCallback, successCallback) {
     errorCallback({ message: "EMAIL IS NOT A VALID CUHK EMAIL" });
     return;
   }
+
+  const emailValidation = /\b\w+@\w+\.\w+/;
+  if (username.match(emailValidation)) {
+    console.log("Username is an email address!");
+    errorCallback({ message: "USERNAME IS AN EMAIL ADDRESS" });
+    return;
+  }
+
   // check if user already exists
   User.findOne({ username: username })
     .then((result) => {
@@ -85,10 +93,16 @@ function logout(req, callback) {
 }
 
 // create session with user logged in
-function startAuthenticatedSession(req, user, callback) {
+function startAuthenticatedSession(
+  req,
+  user,
+  callback,
+  attribute = { type: "normal" }
+) {
   req.session.regenerate((err) => {
     if (!err) {
-      req.session.username = user;
+      req.session.user = user;
+      req.session.type = attribute.type;
       callback();
     } else {
       callback(err);

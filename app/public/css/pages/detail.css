@@ -26,6 +26,7 @@
 .product_title {
   margin: 1rem 0 0 0;
   font-size: 3rem;
+  word-break: break-all;
 }
 
 .attributes {
@@ -51,7 +52,7 @@
   margin: 0;
 }
 
-label {
+.full-screen {
   margin: 0;
   width: 100%;
 }
@@ -100,4 +101,22 @@ input[type="button"] {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .product-simple-area {
+    display: block;
+  }
+
+  .single-product-image {
+    position: relative;
+    margin: 10px auto;
+    height: auto;
+    width: 90%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .single-product-info {
+    padding: 0 5% 0 5%;
+  }
 }

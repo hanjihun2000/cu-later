@@ -68,6 +68,42 @@ h1 {
 .wishlist-area table th,
 .wishlist-area table .product-name,
 .wishlist-area table .product-price,
-.wishlist-area table .product-add-to-cart {
+.wishlist-area table .product-add-to-cart,
+.wishlist-area table .product-stock-status {
   text-align: center;
+}
+
+.wishlist-area table .title {
+  display: none;
+}
+
+.wishlist-area span {
+  word-break: break-all;
+}
+
+@media (max-width: 768px) {
+  .wishlist-area table th {
+    display: none;
+  }
+
+  .wishlist-area table tr {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wishlist-area table td {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+  }
+
+  .wishlist-area table .product-name,
+  .wishlist-area table .product-price,
+  .wishlist-area table .product-add-to-cart,
+  .wishlist-area table .product-stock-status {
+    text-align: left;
+  }
+
+  .wishlist-area table .title {
+    display: block;
+  }
 }

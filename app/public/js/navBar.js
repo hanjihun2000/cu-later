@@ -2,7 +2,7 @@ function fadeOutOnScroll() {
   const body = document.querySelector("body");
   const element = document.querySelector("nav");
   const background = element.querySelector(".background");
-  const logo = element.querySelector(".headerLogo");
+  const logo = element.querySelector(".headerLogo a");
 
   if (!element || !body) {
     return;

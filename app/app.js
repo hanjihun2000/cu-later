@@ -63,7 +63,7 @@ var upload = multer({ storage: storage });
 
 // default home page
 app.get("/", function (req, res) {
-  if (req.session.username === undefined) {
+  if (req.session.user === undefined) {
     res.render("home", { loggedIn: false });
   } else {
     res.render("home", { loggedIn: true });
@@ -71,7 +71,7 @@ app.get("/", function (req, res) {
 });
 
 app.get("/search/buy", function (req, res) {
-  // if (req.session.username === undefined) {
+  // if (req.session.user === undefined) {
   //   res.render("home", {
   //     error: "Please login or register first!",
   //     loggedIn: false,
@@ -94,7 +94,7 @@ app.get("/search/buy", function (req, res) {
       });
       res.render("buy", {
         searchResults: items,
-        loggedIn: req.session.username !== undefined,
+        loggedIn: req.session.user !== undefined,
       });
     })
     .catch((err) => {
@@ -105,7 +105,7 @@ app.get("/search/buy", function (req, res) {
 });
 
 app.get("/search/activity", function (req, res) {
-  // if (req.session.username === undefined) {
+  // if (req.session.user === undefined) {
   //   res.render("home", {
   //     error: "Please login or register first!",
   //     loggedIn: false,
@@ -128,7 +128,7 @@ app.get("/search/activity", function (req, res) {
       });
       res.render("activity", {
         searchResults: items,
-        loggedIn: req.session.username !== undefined,
+        loggedIn: req.session.user !== undefined,
       });
     })
     .catch((err) => {
@@ -141,7 +141,7 @@ app.get("/search/activity", function (req, res) {
 // item buying page
 app.get("/buy", function (req, res) {
   // check login state
-  // if (req.session.username === undefined) {
+  // if (req.session.user === undefined) {
   //   res.render("home", {
   //     error: "Please login or register first!",
   //     loggedIn: false,
@@ -161,7 +161,7 @@ app.get("/buy", function (req, res) {
       });
       res.render("buy", {
         shop: items,
-        loggedIn: req.session.username !== undefined,
+        loggedIn: req.session.user !== undefined,
       });
     })
     .catch((err) => {
@@ -188,11 +188,8 @@ app.post("/buy", function (req, res) {
 });
 
 app.get("/buy/:id", (req, res) => {
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
+  if (req.session.user === undefined) {
+    res.redirect("/login");
   }
 
   let id = req.params.id;
@@ -206,7 +203,7 @@ app.get("/buy/:id", (req, res) => {
       if (!item) {
         res.render("home", {
           error: "Item not found!",
-          loggedIn: req.session.username !== undefined,
+          loggedIn: req.session.user !== undefined,
         });
       }
       res.render("detail", { shop: item, loggedIn: true });
@@ -224,7 +221,7 @@ app.post("/buy/:id", function (req, res) {
     { _id: key },
     {
       $set: { status: "requested" },
-      $push: { requesters: req.session.username.email },
+      $push: { requesters: req.session.user.email },
     },
     { upsert: true, new: true } // new: true to get the updated document in the response
   )
@@ -239,7 +236,7 @@ app.post("/buy/:id", function (req, res) {
 
 // sell page for users to post new items
 app.get("/sell", function (req, res) {
-  if (req.session.username === undefined) {
+  if (req.session.user === undefined) {
     res.render("home", {
       error: "Please login or register first!",
       loggedIn: false,
@@ -259,8 +256,8 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
   if (
     typeof req.body.title !== "string" ||
     typeof req.body.description !== "string" ||
-    !req.session.username ||
-    typeof req.session.username.username !== "string"
+    !req.session.user ||
+    typeof req.session.user.username !== "string"
   ) {
     res.render("sell", { error: "Invalid input!", loggedIn: true });
   } else if (
@@ -276,7 +273,7 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
       title: req.body.title,
       price: parseInt(req.body.price),
       description: req.body.description,
-      owner: req.session.username.username,
+      owner: req.session.user.username,
       img: {
         data: fs.readFileSync("./uploads/" + req.file.filename),
         contentType: req.file.mimetype,
@@ -286,10 +283,13 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
     })
       .save() // save() returns a promise
       .then((item) => {
+        // delete the image from the uploads folder
+        fs.unlinkSync("./uploads/" + req.file.filename);
+
         // Handle successful save
         // update user information by adding new product in place
         return User.findOneAndUpdate(
-          { username: req.session.username.username },
+          { username: req.session.user.username },
           {
             $push: {
               items_sell: req.body.title,
@@ -314,7 +314,7 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
 
 // activity page for users to post new activities
 app.get("/activity", function (req, res) {
-  // if (req.session.username === undefined) {
+  // if (req.session.user === undefined) {
   //   res.render("home", {
   //     error: "Please login or register first!",
   //     loggedIn: false,
@@ -332,7 +332,7 @@ app.get("/activity", function (req, res) {
       });
       res.render("activity", {
         shop: items,
-        loggedIn: req.session.username !== undefined,
+        loggedIn: req.session.user !== undefined,
       });
     })
     .catch((err) => {
@@ -344,6 +344,10 @@ app.get("/activity", function (req, res) {
 
 // activity detail page
 app.get("/activity/:id", (req, res) => {
+  if (req.session.user === undefined) {
+    res.redirect("/login");
+  }
+
   let id = req.params.id;
   const objectId = new mongoose.Types.ObjectId(id);
   Activity.findOne({ _id: objectId })
@@ -371,7 +375,7 @@ app.get("/activity/:id", (req, res) => {
 
 // create form for request botton of an activity, this is to easily digest which user requested from session inputs for reference
 app.get("/create", function (req, res) {
-  if (req.session.username === undefined) {
+  if (req.session.user === undefined) {
     res.render("home", {
       error: "Please login or register first!",
       loggedIn: false,
@@ -390,8 +394,8 @@ app.post("/create", upload.single("image"), function (req, res, next) {
   if (
     typeof req.body.title !== "string" ||
     typeof req.body.description !== "string" ||
-    !req.session.username ||
-    typeof req.session.username.username !== "string"
+    !req.session.user ||
+    typeof req.session.user.username !== "string"
   ) {
     console.log("Debug!");
     res.render("create", { error: "Invalid input!", loggedIn: true });
@@ -399,7 +403,7 @@ app.post("/create", upload.single("image"), function (req, res, next) {
     new Activity({
       title: req.body.title,
       description: req.body.description,
-      organizer: req.session.username.username,
+      organizer: req.session.user.username,
       date: req.body.date,
       img: {
         data: fs.readFileSync("./uploads/" + req.file.filename),
@@ -410,10 +414,13 @@ app.post("/create", upload.single("image"), function (req, res, next) {
     })
       .save() // save() returns a promise
       .then((activity) => {
+        // delete the image from the uploads folder
+        fs.unlinkSync("./uploads/" + req.file.filename);
+
         // Handle successful save
         // update user information by adding new activity
         return User.findOneAndUpdate(
-          { username: req.session.username.username },
+          { username: req.session.user.username },
           {
             $push: {
               activity: req.body.title,
@@ -440,7 +447,7 @@ app.post("/create", upload.single("image"), function (req, res, next) {
 
 // personal history page
 app.get("/personal", function (req, res) {
-  if (req.session.username === undefined) {
+  if (req.session.user === undefined) {
     res.render("home", {
       error: "Please login or register first!",
       loggedIn: false,
@@ -452,11 +459,11 @@ app.get("/personal", function (req, res) {
   // They can also update items' availability by clicking denied (remove requesters) or finished (remove item since transaction is completed).
   else {
     const itemQuery = Item_buy.find({
-      owner: req.session.username.username,
+      owner: req.session.user.username,
       status: "requested",
     }).exec();
     const requestQuery = Item_buy.find({
-      requesters: req.session.username.email,
+      requesters: req.session.user.email,
       status: "requested",
     }).exec();
 
@@ -545,7 +552,7 @@ app.get("/register", (req, res) => {
 
 // login page for users
 app.get("/login", (req, res) => {
-  if (req.session.username !== undefined) {
+  if (req.session.user !== undefined) {
     res.redirect("/");
   } else res.render("login");
 });
@@ -598,15 +605,24 @@ app.post("/cuhkLogin", (req, res) => {
           throw new Error("Invalid CUHK username or password!");
         }
 
-        auth.startAuthenticatedSession(req, { username: username }, (err) => {
-          if (err) {
-            console.log(err);
-          }
-          // close the window after login
-          res.send(
-            "<script>window.close();</script><h1>Login successful! You can close this window now.</h1>"
-          );
-        });
+        auth.startAuthenticatedSession(
+          req,
+          {
+            username: studentNumber,
+            email: username,
+            actions: [],
+          },
+          (err) => {
+            if (err) {
+              console.log(err);
+            }
+            // close the window after login
+            res.send(
+              "<script>window.close();</script><h1>Login successful!</h1><p>You can close this window now.</p>"
+            );
+          },
+          { type: "CUHK" }
+        );
       })
       .catch((error) => {
         res.render("cuhkLogin", {
@@ -645,6 +661,11 @@ app.get("/logout", (req, res) => {
     }
     res.redirect("/login");
   });
+});
+
+// clear the uploaded image
+fs.readdirSync("./uploads").forEach((file) => {
+  fs.unlinkSync(path.join("./uploads", file));
 });
 
 // start server
