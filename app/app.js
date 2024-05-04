@@ -11,6 +11,7 @@ const auth = require("./auth.js");
 const exphbs = require("express-handlebars");
 var fs = require("fs");
 var hbs = require("hbs");
+const https = require("https");
 var path = require("path");
 const crypto = require("crypto");
 
@@ -70,131 +71,150 @@ app.get("/", function (req, res) {
 });
 
 app.get("/search/buy", function (req, res) {
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  } else {
-    var query = req.query.query;
-    Item_buy.find(
-      { title: { $regex: query, $options: "i" }, status: { $ne: "finished" } },
-      function (err, varToStoreResult) {
-        if (err) {
-          console.log(err);
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // } else {
+  var query = req.query.query;
+  Item_buy.find({
+    title: { $regex: query, $options: "i" },
+    status: { $ne: "finished" },
+  })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        // start mapping images
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
         }
-        let items = varToStoreResult;
-        items = items.map((item) => {
-          // start mapping images
-          if (item.img.data !== undefined) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("buy", { searchResults: items, loggedIn: true });
-      }
-    );
-  }
+        return item;
+      });
+      res.render("buy", {
+        searchResults: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 app.get("/search/activity", function (req, res) {
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  } else {
-    var query = req.query.query;
-    Activity.find(
-      {
-        title: { $regex: query, $options: "i" },
-        date: { $gt: new Date() },
-      },
-      function (err, varToStoreResult) {
-        if (err) {
-          console.log(err);
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // } else {
+  var query = req.query.query;
+  Activity.find({
+    title: { $regex: query, $options: "i" },
+    date: { $gt: new Date() },
+  })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        // start mapping images
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
         }
-        let items = varToStoreResult;
-        items = items.map((item) => {
-          // start mapping images
-          if (item.img.data !== undefined) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("activity", { searchResults: items, loggedIn: true });
-      }
-    );
-  }
+        return item;
+      });
+      res.render("activity", {
+        searchResults: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 // item buying page
 app.get("/buy", function (req, res) {
   // check login state
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  }
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // }
   // find all items ready for sale in database, tag finished will be omitted
-  else {
-    Item_buy.find(
-      { status: { $ne: "finished" } },
-      function (err, varToStoreResult) {
-        if (err) {
-          console.log(err);
+  // else {
+  Item_buy.find({ status: { $ne: "finished" } })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
         }
-        let items = varToStoreResult;
-        items = items.map((item) => {
-          // start mapping images
-          if (item.img.data !== undefined) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("buy", { shop: items });
-      }
-    );
-  }
+        return item;
+      });
+      res.render("buy", {
+        shop: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 app.post("/buy", function (req, res) {
   key = Object.keys(req.body)[0];
   Item_buy.findOneAndUpdate(
     { _id: key },
-    {
-      $set: { status: "requested" },
-    },
-    { upsert: true },
-    (err, doc) => {
-      if (err) {
-        console.log("Something wrong when updating data!");
-      }
-    }
-  );
+    { $set: { status: "requested" } },
+    { upsert: true, new: true } // 'new: true' to return the document after update if you need it
+  )
+    .then((doc) => {
+      // Handle the updated document, if needed
+      console.log("Update successful:", doc);
+    })
+    .catch((err) => {
+      console.log("Something wrong when updating data!", err);
+    });
 });
 
 app.get("/buy/:id", (req, res) => {
+  if (req.session.username === undefined) {
+    res.render("home", {
+      error: "Please login or register first!",
+      loggedIn: false,
+    });
+  }
+
   let id = req.params.id;
-  const objectId = mongoose.Types.ObjectId(id);
-  Item_buy.find({ _id: objectId }, function (err, result) {
-    if (err) {
+  const objectId = new mongoose.Types.ObjectId(id);
+  Item_buy.findOne({ _id: objectId })
+    .then((item) => {
+      if (item && item.img && item.img.data) {
+        item.img.data = item.img.data.toString("base64"); // convert the data into base64
+        item.img = item.img.toObject();
+      }
+      if (!item) {
+        res.render("home", {
+          error: "Item not found!",
+          loggedIn: req.session.username !== undefined,
+        });
+      }
+      res.render("detail", { shop: item, loggedIn: true });
+    })
+    .catch((err) => {
       console.log(err);
-    }
-    let item = result[0];
-    if (item.img.data !== undefined) {
-      item.img.data = item.img.data.toString("base64"); // convert the data into base64
-      item.img = item.img.toObject();
-    }
-    res.render("detail", { shop: item, loggedIn: true });
-  });
+      res.status(500).send("Error retrieving item");
+    });
 });
 
 // create form for request botton of a product, this is to easily digest which user requested from session inputs for reference
@@ -203,19 +223,18 @@ app.post("/buy/:id", function (req, res) {
   Item_buy.findOneAndUpdate(
     { _id: key },
     {
-      // update item information by adding new requests
       $set: { status: "requested" },
       $push: { requesters: req.session.username.email },
     },
-    { upsert: true },
-    (err, doc) => {
-      if (err) {
-        console.log("Something wrong when updating data!");
-      } else {
-        res.redirect("/personal");
-      }
-    }
-  );
+    { upsert: true, new: true } // new: true to get the updated document in the response
+  )
+    .then((doc) => {
+      res.redirect("/personal");
+    })
+    .catch((err) => {
+      console.log("Something wrong when updating data!", err);
+      res.status(500).send("Failed to update data");
+    });
 });
 
 // sell page for users to post new items
@@ -264,86 +283,90 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
       },
       status: "posted",
       updated_at: Date.now(),
-    }).save(function (err, Item_sale, count) {
-      if (err) {
-        res.render("sell", { error: "Error saving item!", loggedIn: true });
-        return;
-      }
-      // update user information by adding new product in place
-      User.findOneAndUpdate(
-        { username: req.session.username.username },
-        {
-          $push: {
-            items_sell: req.body.title,
+    })
+      .save() // save() returns a promise
+      .then((item) => {
+        // Handle successful save
+        // update user information by adding new product in place
+        return User.findOneAndUpdate(
+          { username: req.session.username.username },
+          {
+            $push: {
+              items_sell: req.body.title,
+            },
           },
-        },
-        { new: true },
-        (err, doc) => {
-          if (err) {
-            res.render("sell", {
-              error: "Error updating user information!",
-              loggedIn: true,
-            });
-            return;
-          }
-          res.redirect("/buy");
-        }
-      );
-    });
+          { new: true } // 'new: true' to get the updated document back
+        );
+      })
+      .then((doc) => {
+        // Handle successful user update
+        res.redirect("/buy");
+      })
+      .catch((err) => {
+        // Handle errors
+        res.render("sell", {
+          error: "Error saving or updating item!",
+          loggedIn: true,
+        });
+      });
   }
 });
 
 // activity page for users to post new activities
 app.get("/activity", function (req, res) {
-  if (req.session.username === undefined) {
-    res.render("home", {
-      error: "Please login or register first!",
-      loggedIn: false,
-    });
-  } else {
-    Activity.find(
-      { date: { $gt: new Date() } },
-      function (err, varToStoreResult) {
-        if (err) {
-          console.log(err);
+  // if (req.session.username === undefined) {
+  //   res.render("home", {
+  //     error: "Please login or register first!",
+  //     loggedIn: false,
+  //   });
+  // } else {
+  Activity.find({ date: { $gt: new Date() } })
+    .then((varToStoreResult) => {
+      let items = varToStoreResult.map((item) => {
+        if (item.img && item.img.data) {
+          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item._id = item._id.toString();
+          item.img = item.img.toObject();
         }
-        let items = varToStoreResult;
-        items = items.map((item) => {
-          // start mapping images
-          if (item.img.data !== undefined) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
-            item._id = item._id.toString();
-            item.img = item.img.toObject();
-          }
-          return item;
-        });
-        res.render("activity", { shop: items });
-      }
-    );
-  }
+        return item;
+      });
+      res.render("activity", {
+        shop: items,
+        loggedIn: req.session.username !== undefined,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send("An error occurred while fetching the data");
+    });
+  // }
 });
 
 // activity detail page
 app.get("/activity/:id", (req, res) => {
   let id = req.params.id;
-  const objectId = mongoose.Types.ObjectId(id);
-  Activity.find({ _id: objectId }, function (err, result) {
-    if (err) {
+  const objectId = new mongoose.Types.ObjectId(id);
+  Activity.findOne({ _id: objectId })
+    .then((item) => {
+      if (!item) {
+        throw new Error("Activity not found");
+      }
+      item.deadline = item.date.toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      if (item.img && item.img.data) {
+        item.img.data = item.img.data.toString("base64"); // convert the data into base64
+        item.img = item.img.toObject();
+      }
+      res.render("content", { shop: item, loggedIn: true });
+    })
+    .catch((err) => {
       console.log(err);
-    }
-    let item = result[0];
-    item.deadline = item.date.toLocaleDateString("en-US", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+      res.status(500).send("An error occurred while fetching the data");
     });
-    if (item.img.data !== undefined) {
-      item.img.data = item.img.data.toString("base64"); // convert the data into base64
-      item.img = item.img.toObject();
-    }
-    res.render("content", { shop: item, loggedIn: true });
-  });
 });
 
 // create form for request botton of an activity, this is to easily digest which user requested from session inputs for reference
@@ -384,33 +407,34 @@ app.post("/create", upload.single("image"), function (req, res, next) {
       },
       status: "posted",
       updated_at: Date.now(),
-    }).save(function (err, Item_sale, count) {
-      if (err) {
-        res.render("create", { error: "Error saving item!", loggedIn: true });
-        return;
-      }
-      // update user information by adding new product in place
-      User.findOneAndUpdate(
-        { username: req.session.username.username },
-        {
-          $push: {
-            activity: req.body.title,
+    })
+      .save() // save() returns a promise
+      .then((activity) => {
+        // Handle successful save
+        // update user information by adding new activity
+        return User.findOneAndUpdate(
+          { username: req.session.username.username },
+          {
+            $push: {
+              activity: req.body.title,
+            },
           },
-        },
-        { new: true },
-        (err, doc) => {
-          if (err) {
-            res.render("create", {
-              error: "Error updating user information!",
-              loggedIn: true,
-            });
-            return;
-          }
-          console.log("redirecting to activity page");
-          res.redirect("/activity");
-        }
-      );
-    });
+          { new: true }
+        );
+      })
+      .then((doc) => {
+        // Handle successful user update
+        console.log("redirecting to activity page");
+        res.redirect("/activity");
+      })
+      .catch((err) => {
+        // Handle errors
+        console.log(err);
+        res.render("create", {
+          error: "Error saving or updating activity!",
+          loggedIn: true,
+        });
+      });
   }
 });
 
@@ -427,29 +451,27 @@ app.get("/personal", function (req, res) {
   // Sellers are able to see requesters' emails and initiate contacts.
   // They can also update items' availability by clicking denied (remove requesters) or finished (remove item since transaction is completed).
   else {
-    Item_buy.find(
-      { owner: req.session.username.username, status: "requested" },
-      function (err, varToStoreResult) {
-        if (err) {
-          console.log(err);
-        }
-        const items = varToStoreResult;
-        Item_buy.find(
-          { requesters: req.session.username.email, status: "requested" },
-          function (err, varToStoreResult) {
-            if (err) {
-              console.log(err);
-            }
-            const request = varToStoreResult;
-            res.render("personal", {
-              shop: items,
-              request: request,
-              loggedIn: true,
-            });
-          }
-        );
-      }
-    );
+    const itemQuery = Item_buy.find({
+      owner: req.session.username.username,
+      status: "requested",
+    }).exec();
+    const requestQuery = Item_buy.find({
+      requesters: req.session.username.email,
+      status: "requested",
+    }).exec();
+
+    Promise.all([itemQuery, requestQuery])
+      .then(([items, requests]) => {
+        res.render("personal", {
+          shop: items,
+          request: requests,
+          loggedIn: true,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching the data");
+      });
   }
 });
 
@@ -464,16 +486,15 @@ app.post("/personal", function (req, res) {
       {
         $set: { status: result, requesters: [] },
       },
-      { upsert: true },
-      (err, doc) => {
-        if (err) {
-          console.log("Something wrong when updating data!");
-        } else {
-          console.log(doc);
-          res.redirect("/personal");
-        }
-      }
-    );
+      { upsert: true, new: true }
+    )
+      .then((doc) => {
+        console.log(doc);
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+      });
   } else {
     // remove all requesters from list, transaction is denied and item is reposted for requests
     result = "posted";
@@ -483,15 +504,14 @@ app.post("/personal", function (req, res) {
       {
         $set: { status: result, requesters: [] },
       },
-      { upsert: true },
-      (err, doc) => {
-        if (err) {
-          console.log("Something wrong when updating data!");
-        } else {
-          res.redirect("/personal");
-        }
-      }
-    );
+      { upsert: true, new: true }
+    )
+      .then((doc) => {
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+      });
   }
 });
 
@@ -627,7 +647,23 @@ app.get("/logout", (req, res) => {
   });
 });
 
+// start server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
+
+// support https
+try {
+  const credentials = {
+    key: fs.readFileSync(process.env.SSL_KEY || "/etc/secrets/key.pem"),
+    cert: fs.readFileSync(process.env.SSL_CERT || "/etc/secrets/cert.pem"),
+  };
+  const httpsServer = https.createServer(credentials, app);
+  const SSL_PORT = process.env.SSL_PORT || 8443;
+  httpsServer.listen(SSL_PORT, () => {
+    console.log(`Server listening on port ${SSL_PORT}...`);
+  });
+} catch (err) {
+  console.log("HTTPS not available", err);
+}

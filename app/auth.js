@@ -13,51 +13,64 @@ function register(username, email, password, errorCallback, successCallback) {
     return;
   }
   // check if user already exists
-  User.findOne({ username: username }, (err, result, count) => {
-    if (result) {
-      console.log("username exists!");
-      errorCallback({ message: "USERNAME ALREADY EXISTS" });
-    } else {
-      // hash passwords to prevent leak
-      bcrypt.hash(password, 10, function (err, hash) {
-        // create new user
-        new User({
-          username: username,
-          email: email,
-          password: hash,
-          actions: [],
-        }).save(function (err, user, count) {
-          if (err) {
-            console.log(count);
-            console.log("document save error!");
-            errorCallback({ message: "DOCUMENT SAVE ERROR" });
-          } else {
-            successCallback(user);
-          }
-        });
-      });
-    }
-  });
+  User.findOne({ username: username })
+    .then((result) => {
+      if (result) {
+        console.log("Username exists!");
+        errorCallback({ message: "USERNAME ALREADY EXISTS" });
+      } else {
+        // hash passwords to prevent leak
+        return bcrypt.hash(password, 10);
+      }
+    })
+    .then((hash) => {
+      // create new user
+      return new User({
+        username: username,
+        email: email,
+        password: hash,
+        actions: [],
+      }).save();
+    })
+    .then((user) => {
+      successCallback(user);
+    })
+    .catch((err) => {
+      console.log("Error:", err);
+      errorCallback({ message: "DOCUMENT SAVE ERROR" });
+    });
 }
 
 // function to check login credentials
 function login(username, password, errorCallback, successCallback) {
-  User.findOne({ username: username }, (err, user) => {
-    if (!err && user) {
+  User.findOne({ username: username })
+    .then((user) => {
+      if (!user) {
+        console.log("user not found!");
+        errorCallback({ message: "USER NOT FOUND" });
+        return;
+      }
+
       // unhash passwords using bcrypt
-      bcrypt.compare(password, user.password, (err, passwordMatch) => {
-        if (passwordMatch) {
-          successCallback(user);
-        } else {
-          console.log("passwords do not match!");
-          errorCallback({ message: "PASSWORDS DO NOT MATCH" });
-        }
-      });
-    } else {
-      console.log("user not found!");
-      errorCallback({ message: "USER NOT FOUND" });
-    }
-  });
+      bcrypt
+        .compare(password, user.password)
+        .then((passwordMatch) => {
+          if (passwordMatch) {
+            successCallback(user);
+          } else {
+            console.log("passwords do not match!");
+            errorCallback({ message: "PASSWORDS DO NOT MATCH" });
+          }
+        })
+        .catch((err) => {
+          console.log("Error comparing passwords", err);
+          errorCallback({ message: "ERROR COMPARING PASSWORDS" });
+        });
+    })
+    .catch((err) => {
+      console.log("Error finding user", err);
+      errorCallback({ message: "ERROR FINDING USER" });
+    });
 }
 
 // function to end the authenticated session (logout)
