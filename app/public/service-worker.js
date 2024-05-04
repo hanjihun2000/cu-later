@@ -34,7 +34,6 @@ self.addEventListener("activate", async () => {
       ),
       userVisibleOnly: true,
     });
-    console.log(JSON.stringify(subscription));
     const response = await saveSubscription(subscription);
     console.log("response", response);
   } catch (err) {

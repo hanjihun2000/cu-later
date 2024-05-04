@@ -692,29 +692,21 @@ app.post(`/save-subscription`, async (req, res) => {
 
 app.post(`/send-notification`, async (req, res) => {
   try {
-    const { id } = req.body;
-    const sub = await models.subscriptions.findOne({ where: { id } });
-    const message = {
-      body: "Elon Musk sent you a friend request",
-      icon: "https://media.npr.org/assets/img/2022/06/01/ap22146727679490-6b4aeaa7fd9c9b23d41bbdf9711ba54ba1e7b3ae-s800-c85.webp",
-      data: {
-        requestId: "1234",
-        username: "elonmusk",
-      },
-      actions: [
-        {
-          action: "accept",
-          title: "Accept",
+    // get the user's subscription
+    const userEmail = "Anson.12666@icloud.com";
+    const notification_body = "Test notification";
+
+    const user = await User.findOne({ email: userEmail });
+    user.subscription.forEach(async (sub) => {
+      await sendNotification(sub, {
+        body: notification_body,
+        data: {
+          requestId: Math.random().toString(36).substring(2, 15),
+          username: user.username,
         },
-        {
-          action: "view_profile",
-          title: "View Profile",
-        },
-      ],
-      tag: "friend_request",
-    };
-    await sendNotification(sub.subsription, message);
-    res.json({ message: "message sent" });
+      });
+      console.log(`Notification sent to ${userEmail}`);
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

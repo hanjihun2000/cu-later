@@ -2,7 +2,7 @@ const webpush = require("web-push");
 const { PUSH_PRIVATE_KEY, PUSH_PUBLIC_KEY } = process.env;
 //setting our previously generated VAPID keys
 webpush.setVapidDetails(
-  "mailto:<your_email>",
+  "mailto:admin@cu-later.com",
   PUSH_PUBLIC_KEY,
   PUSH_PRIVATE_KEY
 );

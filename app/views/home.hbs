@@ -62,38 +62,17 @@
 
     <button class="notify">Notify Me</button>
     <script>
-      const sendNotification = async () => {
-        let notificationOptions = {
-          body: "Elon Musk sent you a friend request",
-        data: {
-            requestId: "1234",
-            username: "elonmusk"
-          },
-          actions: [
-            {
-              action: "accept",
-              title: "Accept",
-            },
-            {
-              action: "view_profile",
-              title: "View Profile",
-            },
-          ],
-          tag: "friend_request",
-        };
-
-
+      document.querySelector(".notify").addEventListener("click", async () => {
         if(!("Notification" in window)){
-                throw new Error("Your browser does not support push notification");
+          window.alert("This browser does not support desktop notification");
         }
-
-        const sw = await registerServiceWorker();
-        Notification.requestPermission().then((Permission)=>{
-            sw.showNotification("Friend Request", notificationOptions);
+        Notification.requestPermission().then(async (Permission)=>{
+          const sw = await registerServiceWorker();
+          sw.showNotification("CU-LATER", {
+            body: "You have enabled push notification",
+          });
         });
-      };
-      const Notifybtn = document.querySelector(".notify");
-      Notifybtn.addEventListener("click", sendNotification);
+      });
     </script>
 
     {{> import_footer}}
