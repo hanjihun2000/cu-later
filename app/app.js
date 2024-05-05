@@ -9,11 +9,15 @@ const User = mongoose.model("User");
 const session = require("express-session");
 const auth = require("./auth.js");
 const exphbs = require("express-handlebars");
+const cors = require("cors");
+const { sendNotification } = require("./push_helper");
 var fs = require("fs");
 var hbs = require("hbs");
 const https = require("https");
 var path = require("path");
+var bodyParser = require("body-parser");
 const crypto = require("crypto");
+const sendmail = require("sendmail")();
 
 // register partials for handlebars
 var partialsDir = __dirname + "/views/partials";
@@ -30,8 +34,20 @@ filenames.forEach(function (filename) {
 
 // use public folder and handlebars engine
 app.use(express.static("public"));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: false }));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+app.use(bodyParser.json());
+app.disable("x-powered-by");
 // TODO: remove the cache control header for production
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store");
@@ -60,6 +76,43 @@ var storage = multer.diskStorage({
 });
 
 var upload = multer({ storage: storage });
+
+const pushNotification = async (user, notification_body) => {
+  user?.subscription?.forEach(async (sub) => {
+    await sendNotification(sub, {
+      body: notification_body,
+      data: {
+        requestId: Math.random().toString(36).substring(2, 15),
+        username: user.username,
+      },
+    });
+  });
+};
+
+const pushEmail = async (userEmail, notification_body) => {
+  sendmail(
+    {
+      from: "CU-LATER",
+      to: userEmail,
+      subject: "CU-LATER Notification",
+      html: notification_body,
+    },
+    function (err, reply) {
+      console.log(err && err.stack);
+      // console.dir(reply);
+    }
+  );
+};
+
+const pushMessages = async (user, notification_body) => {
+  // get user email from username
+  const userObj = await User.findOne(
+    user.email ? { email: user.email } : { username: user.username }
+  );
+
+  pushNotification(userObj, notification_body);
+  pushEmail(userObj.email, notification_body);
+};
 
 // default home page
 app.get("/", function (req, res) {
@@ -136,7 +189,9 @@ app.get("/search/activity", function (req, res) {
 
 // item buying page
 app.get("/buy", function (req, res) {
-  var preference = req.session.user ? req.session.user.preference : [];
+  var preference = req.session.user
+    ? req.session.user.preferences.preference
+    : [];
   if (!preference || preference.length === 0) {
     Item_buy.find({ status: { $ne: "finished" } })
       .sort({
@@ -245,6 +300,11 @@ app.post("/buy/:id", function (req, res) {
     { upsert: true, new: true } // new: true to get the updated document in the response
   )
     .then((doc) => {
+      // search doc.owner email by its username(doc.owner) and send notification
+      pushMessages(
+        { username: doc.owner },
+        `You have a new request for ${doc.title}!`
+      );
       res.redirect("/personal");
     })
     .catch((err) => {
@@ -486,8 +546,9 @@ app.get("/personal", function (req, res) {
         res.render("personal", {
           shop: items,
           request: requests,
-          preference: user.preference,
+          preference: user.preferences.preference,
           loggedIn: true,
+          sendEmail: req.session.user.preferences.sendEmail,
         });
       })
       .catch((err) => {
@@ -503,38 +564,89 @@ app.post("/personal", function (req, res) {
   if (Object.values(req.body)[0] === "Finished") {
     result = "finished";
     key = Object.keys(req.body)[0];
-    Item_buy.findOneAndUpdate(
-      { _id: key },
-      {
-        $set: { status: result, requesters: [] },
-      },
-      { upsert: true, new: true }
-    )
+    Item_buy.findOne({ _id: key }) // Find the document before updating
       .then((doc) => {
-        console.log(doc);
-        res.redirect("/personal");
+        if (!doc) {
+          // Handle case where document is not found
+          return res.status(404).send("Document not found");
+        }
+
+        // Update document fields
+        doc.status = result;
+        const requesters = doc.requesters;
+        doc.requesters = [];
+
+        // Save the updated document
+        return doc.save().then((updatedDoc) => {
+          // Use the updated document here
+          requesters.forEach((email) => {
+            pushMessages(
+              { email: email },
+              `Transaction for ${updatedDoc.title} is completed!`
+            );
+          });
+          res.redirect("/personal");
+        });
       })
       .catch((err) => {
         console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
       });
   } else {
     // remove all requesters from list, transaction is denied and item is reposted for requests
     result = "posted";
     key = Object.keys(req.body)[0];
-    Item_buy.findOneAndUpdate(
-      { _id: key },
-      {
-        $set: { status: result, requesters: [] },
-      },
-      { upsert: true, new: true }
-    )
+    Item_buy.findOne({ _id: key }) // Find the document before updating
       .then((doc) => {
-        res.redirect("/personal");
+        if (!doc) {
+          // Handle case where document is not found
+          return res.status(404).send("Document not found");
+        }
+
+        // Update document fields
+        doc.status = result;
+        const requesters = doc.requesters;
+        doc.requesters = [];
+
+        // Save the updated document
+        return doc.save().then((updatedDoc) => {
+          // Use the updated document here
+          requesters.forEach((email) => {
+            pushMessages(
+              { email: email },
+              `Transaction for ${updatedDoc.title} is denied!`
+            );
+          });
+          res.redirect("/personal");
+        });
       })
       .catch((err) => {
         console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
       });
   }
+});
+
+app.post("/personal/updatePreference", function (req, res) {
+  const email = req.session.user.email;
+  const sendEmail = req.body.sendEmail === "on";
+  User.findOneAndUpdate(
+    { email: email },
+    {
+      $set: {
+        "preferences.sendEmail": sendEmail,
+      },
+    },
+    { new: true }
+  )
+    .then((result) => {
+      req.session.user.preferences.sendEmail = sendEmail;
+      res.redirect("/personal");
+    })
+    .catch((err) => {
+      console.log("Something wrong when updating data!", err);
+      res.status(500).send("Internal Server Error");
+    });
 });
 
 // take input from user to register new account
@@ -677,6 +789,32 @@ app.get("/logout", (req, res) => {
     }
     res.redirect("/login");
   });
+});
+
+app.post(`/save-subscription`, async (req, res) => {
+  try {
+    const subscription = JSON.stringify(req.body);
+    const user = await User.findOne({ email: req.session.user.email });
+    user.subscription.push(JSON.parse(subscription));
+    await user.save();
+    res.status(201).json({ message: "Subscription Successful" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post(`/unsubscribe`, async (req, res) => {
+  try {
+    const subscription = JSON.stringify(req.body);
+    const user = await User.findOne({ email: req.session.user.email });
+    user.subscription = user.subscription.filter(
+      (sub) => JSON.stringify(sub) !== subscription
+    );
+    await user.save();
+    res.status(201).json({ message: "Unsubscription Successful" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // clear the uploaded image
