@@ -218,9 +218,8 @@ app.get("/buy", function (req, res) {
       });
   } else {
     Item_buy.find({
-      $or: ["Books", "Electronics", "Clothes", "Gloceries"].map((category) => ({
-        category,
-        [`preferences.preference.${category}`]: true,
+      $or: Object.keys(preference).map((category) => ({
+        category: category,
       })),
       status: { $ne: "finished" },
     })
@@ -375,13 +374,25 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
         );
       })
       .then((doc) => {
+        // find all users that have preferences for this category and send notification
+        User.find({
+          [`preferences.preference.${req.body.category}`]: true,
+        }).then((users) => {
+          users.forEach((user) => {
+            pushMessages(
+              { email: user.email },
+              `There is a new item ${req.body.title} in ${req.body.category} category!`
+            );
+          });
+        });
+
         // Handle successful user update
         res.redirect("/buy");
       })
       .catch((err) => {
         // Handle errors
         res.render("sell", {
-          error: "Error saving or updating item!",
+          error: `Error saving or updating item! ${err}`,
           loggedIn: true,
         });
       });
