@@ -28,9 +28,16 @@ document.querySelector("#push").addEventListener("click", async () => {
 
 // if service worker is registered, make #push checked
 if (navigator.serviceWorker) {
-  navigator.serviceWorker.getRegistration().then((registration) => {
-    if (registration) {
-      document.querySelector("#push").checked = true;
+  const response = navigator.serviceWorker.getRegistrations();
+  response.then((registrations) => {
+    for (let registration of registrations) {
+      const channel = new MessageChannel();
+      registration.active.postMessage("checkSubscription", [channel.port2]);
+      channel.port1.onmessage = (event) => {
+        if (event.data) {
+          document.querySelector("#push").checked = true;
+        }
+      };
     }
   });
 }

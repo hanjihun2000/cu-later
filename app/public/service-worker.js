@@ -12,7 +12,7 @@ const urlB64ToUint8Array = (base64String) => {
 };
 
 const saveSubscription = async (subscription) => {
-  const response = await fetch("http://localhost:8080/save-subscription", {
+  const response = await fetch("/save-subscription", {
     method: "post",
     headers: {
       "Content-Type": "application/json",
@@ -22,11 +22,27 @@ const saveSubscription = async (subscription) => {
   return response.json();
 };
 
+const checkSubscription = async () => {
+  const subscription = await self.registration.pushManager.getSubscription();
+  if (!subscription) {
+    return null;
+  }
+  const response = await fetch("/check-subscription", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(subscription),
+  });
+  const data = await response.json();
+  return data.message;
+};
+
 // on unregistering service worker
 self.addEventListener("unregister", async () => {
   const subscription = await self.registration.pushManager.getSubscription();
   if (subscription) {
-    fetch("http://localhost:8080/unsubscribe", {
+    fetch("/unsubscribe", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -37,12 +53,18 @@ self.addEventListener("unregister", async () => {
   }
 });
 
+const getPublicKey = async () => {
+  const response = await fetch("/public-key");
+  const data = await response.json();
+  return data.key;
+};
+
 self.addEventListener("activate", async () => {
   try {
     const subscription = await self.registration.pushManager.subscribe({
       applicationServerKey: urlB64ToUint8Array(
         // need to change if you want to use your own key
-        "BEQSh_hG7ob48m_G3JEI38Mu6E6-YntJ4bQF9whlfITry6_pmxcfPntMp2nfTtEHG31v0MzW0hgCUJ0Fpvl0WPA"
+        await getPublicKey()
       ),
       userVisibleOnly: true,
     });
@@ -63,5 +85,12 @@ self.addEventListener("push", function (event) {
       JSON.parse(event.data.text()),
       self.registration
     );
+  }
+});
+
+self.addEventListener("message", async (event) => {
+  if (event.data === "checkSubscription") {
+    const data = await checkSubscription();
+    event.ports[0].postMessage(data);
   }
 });

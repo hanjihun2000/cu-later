@@ -255,14 +255,9 @@ app.post("/buy", function (req, res) {
     { _id: key },
     { $set: { status: "requested" } },
     { upsert: true, new: true } // 'new: true' to return the document after update if you need it
-  )
-    .then((doc) => {
-      // Handle the updated document, if needed
-      console.log("Update successful:", doc);
-    })
-    .catch((err) => {
-      console.log("Something wrong when updating data!", err);
-    });
+  ).catch((err) => {
+    console.log("Something wrong when updating data!", err);
+  });
 });
 
 app.get("/buy/:id", (req, res) => {
@@ -826,6 +821,11 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get("/public-key", async (req, res) => {
+  // get from environment variable (PUSH_PUBLIC_KEY)
+  res.json({ key: process.env.PUSH_PUBLIC_KEY });
+});
+
 app.post(`/save-subscription`, async (req, res) => {
   try {
     const subscription = JSON.stringify(req.body);
@@ -833,6 +833,19 @@ app.post(`/save-subscription`, async (req, res) => {
     user.subscription.push(JSON.parse(subscription));
     await user.save();
     res.status(201).json({ message: "Subscription Successful" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post(`/check-subscription`, async (req, res) => {
+  try {
+    const subscription = JSON.stringify(req.body);
+    const user = await User.findOne({ email: req.session.user.email });
+    const isSubscribed = user.subscription.some(
+      (sub) => sub.endpoint === JSON.parse(subscription).endpoint
+    );
+    res.status(201).json({ message: isSubscribed });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

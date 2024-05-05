@@ -10,7 +10,6 @@ webpush.setVapidDetails(
 const sendNotification = async (subscription, dataToSend) => {
   try {
     await webpush.sendNotification(subscription, JSON.stringify(dataToSend)); //string or Node Buffer
-    console.log(`Notification sent`);
   } catch (error) {
     console.log(error);
   }
