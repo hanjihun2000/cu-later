@@ -629,24 +629,53 @@ app.post("/personal", function (req, res) {
 
 app.post("/personal/updatePreference", function (req, res) {
   const email = req.session.user.email;
-  const sendEmail = req.body.sendEmail === "on";
-  User.findOneAndUpdate(
-    { email: email },
-    {
-      $set: {
-        "preferences.sendEmail": sendEmail,
+  if (req.body.category === undefined) {
+    const sendEmail = req.body.sendEmail === "on";
+    User.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          "preferences.sendEmail": sendEmail,
+        },
       },
-    },
-    { new: true }
-  )
-    .then((result) => {
-      req.session.user.preferences.sendEmail = sendEmail;
-      res.redirect("/personal");
-    })
-    .catch((err) => {
-      console.log("Something wrong when updating data!", err);
-      res.status(500).send("Internal Server Error");
-    });
+      { new: true }
+    )
+      .then((result) => {
+        req.session.user.preferences.sendEmail = sendEmail;
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
+      });
+  } else {
+    const preference =
+      typeof req.body.category === "string"
+        ? [req.body.category]
+        : req.body.category;
+    User.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          "preferences.preference": {
+            Books: preference.includes("Books"),
+            Electronics: preference.includes("Electronics"),
+            Clothes: preference.includes("Clothes"),
+            Gloceries: preference.includes("Gloceries"),
+          },
+        },
+      },
+      { new: true }
+    )
+      .then((result) => {
+        req.session.user.preferences.preference = preference;
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
+      });
+  }
 });
 
 // take input from user to register new account

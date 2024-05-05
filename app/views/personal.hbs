@@ -37,14 +37,17 @@
                     <span class="slider round"></span>
                 </label>
             </form>
-            <div class="wishlist-area">
-                {{!-- button to manage preferences --}}
-                {{#each preference}}
-                <div class="preference">
-                    <span>{{this}}</span>
-                </div>
-                {{/each}}
-            </div>
+        </div>
+        <div class="wishlist-area">
+            <form class="Category-Form-Field" method="POST" action="/personal/updatePreference" onchange="this.submit()">
+                <label for="category" class="Category-Form-Label">Your preference:</label>
+                <select name="category" id="category" multiple>
+                    <option value="Books" {{#if preference.Books}}selected{{/if}}>Books</option>
+                    <option value="Electronics" {{#if preference.Electronics}}selected{{/if}}>Electronics</option>
+                    <option value="Clothes" {{#if preference.Clothes}}selected{{/if}}>Clothes</option>
+                    <option value="Gloceries" {{#if preference.Gloceries}}selected{{/if}}>Gloceries</option>
+                </select>
+            </form>
         </div>
 
 

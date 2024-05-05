@@ -43,7 +43,12 @@ const User = new mongoose.Schema({
   items_buy: [{ type: String, ref: "Item_buy.title" }],
   activity: [{ type: String, ref: "Activity.title" }],
   preferences: {
-    preference: [{ type: String, ref: "Item_buy.category", default: "Books" }],
+    preference: {
+      Books: { type: Boolean, default: false },
+      Electronics: { type: Boolean, default: false },
+      Clothes: { type: Boolean, default: false },
+      Gloceries: { type: Boolean, default: false },
+    },
     sendEmail: { type: Boolean, default: false },
   },
   subscription: [
