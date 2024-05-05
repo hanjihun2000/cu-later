@@ -3,28 +3,29 @@ const mongoose = require("mongoose");
 const User = mongoose.model("User");
 
 // function to register new users
-function register(username, email, password, errorCallback, successCallback) {
+function register(
+  username,
+  email,
+  password,
+  category,
+  errorCallback,
+  successCallback
+) {
   // check if email is valid (CUHK email)
-  console.log(email);
   const validation = /\b1155\d{6}@link.cuhk.edu.hk$/;
   if (!email.match(validation)) {
-    console.log("email is not a valid CUHK email!");
     errorCallback({ message: "EMAIL IS NOT A VALID CUHK EMAIL" });
     return;
   }
-
   const emailValidation = /\b\w+@\w+\.\w+/;
   if (username.match(emailValidation)) {
-    console.log("Username is an email address!");
     errorCallback({ message: "USERNAME IS AN EMAIL ADDRESS" });
     return;
   }
-
   // check if user already exists
   User.findOne({ username: username })
     .then((result) => {
       if (result) {
-        console.log("Username exists!");
         errorCallback({ message: "USERNAME ALREADY EXISTS" });
       } else {
         // hash passwords to prevent leak
@@ -33,10 +34,21 @@ function register(username, email, password, errorCallback, successCallback) {
     })
     .then((hash) => {
       // create new user
+
+      const preference = typeof category === "string" ? [category] : category;
+
       return new User({
         username: username,
         email: email,
         password: hash,
+        preferences: {
+          preference: {
+            Books: preference.includes("Books"),
+            Electronics: preference.includes("Electronics"),
+            Clothes: preference.includes("Clothes"),
+            Gloceries: preference.includes("Gloceries"),
+          },
+        },
         actions: [],
       }).save();
     })
@@ -54,11 +66,9 @@ function login(username, password, errorCallback, successCallback) {
   User.findOne({ username: username })
     .then((user) => {
       if (!user) {
-        console.log("user not found!");
         errorCallback({ message: "USER NOT FOUND" });
         return;
       }
-
       // unhash passwords using bcrypt
       bcrypt
         .compare(password, user.password)
@@ -66,17 +76,14 @@ function login(username, password, errorCallback, successCallback) {
           if (passwordMatch) {
             successCallback(user);
           } else {
-            console.log("passwords do not match!");
             errorCallback({ message: "PASSWORDS DO NOT MATCH" });
           }
         })
         .catch((err) => {
-          console.log("Error comparing passwords", err);
           errorCallback({ message: "ERROR COMPARING PASSWORDS" });
         });
     })
     .catch((err) => {
-      console.log("Error finding user", err);
       errorCallback({ message: "ERROR FINDING USER" });
     });
 }

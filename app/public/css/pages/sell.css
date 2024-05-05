@@ -73,20 +73,26 @@ form {
   font-size: 12px;
 }
 
-.File-Form-Field {
+.File-Form-Field,
+.Category-Form-Field {
   position: relative;
   margin-bottom: 20px;
   width: 100%;
+  padding: 0 10px;
   border: 1px solid #9e9e9a;
-  padding: 15px 10px;
   border-radius: 5px;
+}
+
+.File-Form-Field {
+  padding: 15px 10px;
 }
 
 .File-Form-Field input {
   display: none;
 }
 
-.File-Form-Field .File-Form-Label {
+.File-Form-Field .File-Form-Label,
+.Category-Form-Field .Category-Form-Label {
   margin: 0;
   display: block;
   text-align: left;
@@ -99,6 +105,25 @@ form {
     font-size 0.1s ease-in-out, width 0.1s ease-in-out;
   user-select: none;
   cursor: pointer;
+}
+
+.Category-Form-Field .Category-Form-Label {
+  position: absolute;
+  top: -7.5px;
+  left: 10px;
+  width: fit-content;
+  font-size: 12px;
+}
+
+.Category-Form-Field select {
+  width: 100%;
+  border: none;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  padding: 15px 0;
 }
 
 .File-Form-Field input:valid ~ .File-Form-Label {

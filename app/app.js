@@ -124,24 +124,41 @@ app.get("/", function (req, res) {
 });
 
 app.get("/search/buy", function (req, res) {
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // } else {
+  var preference = req.session.user
+    ? req.session.user.preferences.preference
+    : [];
+
   var query = req.query.query;
-  Item_buy.find({
-    title: { $regex: query, $options: "i" },
-    status: { $ne: "finished" },
-  })
-    .then((varToStoreResult) => {
-      let items = varToStoreResult.map((item) => {
-        // start mapping images
+  var preferredCategories = Object.keys(preference).filter(
+    (key) => preference[key]
+  );
+
+  Item_buy.aggregate([
+    {
+      $match: {
+        $and: [
+          { title: { $regex: query, $options: "i" } },
+          { status: { $ne: "finished" } },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        isPreferred: {
+          $in: ["$category", preferredCategories],
+        },
+      },
+    },
+    {
+      $sort: { isPreferred: -1, date: -1 }, // Sorting by preference first, then by date (newest first)
+    },
+  ])
+    .then((items) => {
+      items = items.map((item) => {
         if (item.img && item.img.data) {
-          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item.img.data = item.img.data.toString("base64"); // Convert image data to base64
           item._id = item._id.toString();
-          item.img = item.img.toObject();
+          item.img = item.img.toObject ? item.img.toObject() : item.img;
         }
         return item;
       });
@@ -154,21 +171,18 @@ app.get("/search/buy", function (req, res) {
       console.log(err);
       res.status(500).send("An error occurred while fetching the data");
     });
-  // }
 });
 
 app.get("/search/activity", function (req, res) {
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // } else {
   var query = req.query.query;
   Activity.find({
     title: { $regex: query, $options: "i" },
     date: { $gt: new Date() },
   })
+    .sort({
+      // sort by date (earliest first)
+      created: -1,
+    })
     .then((varToStoreResult) => {
       let items = varToStoreResult.map((item) => {
         // start mapping images
@@ -193,35 +207,74 @@ app.get("/search/activity", function (req, res) {
 
 // item buying page
 app.get("/buy", function (req, res) {
-  // check login state
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // }
-  // find all items ready for sale in database, tag finished will be omitted
-  // else {
-  Item_buy.find({ status: { $ne: "finished" } })
-    .then((varToStoreResult) => {
-      let items = varToStoreResult.map((item) => {
-        if (item.img && item.img.data) {
-          item.img.data = item.img.data.toString("base64"); // convert the data into base64
-          item._id = item._id.toString();
-          item.img = item.img.toObject();
-        }
-        return item;
+  var preference = req.session.user
+    ? req.session.user.preferences.preference
+    : [];
+  if (!preference || preference.length === 0) {
+    Item_buy.find({ status: { $ne: "finished" } })
+      .sort({
+        // sort by date (earliest first)
+        date: -1,
+      })
+      .then((varToStoreResult) => {
+        let items = varToStoreResult.map((item) => {
+          if (item.img && item.img.data) {
+            item.img.data = item.img.data.toString("base64"); // convert the data into base64
+            item._id = item._id.toString();
+            item.img = item.img.toObject();
+          }
+          return item;
+        });
+        res.render("buy", {
+          shop: items,
+          loggedIn: req.session.user !== undefined,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching the data");
       });
-      res.render("buy", {
-        shop: items,
-        loggedIn: req.session.user !== undefined,
+  } else {
+    const preferredCategories = Object.keys(preference).filter(
+      (key) => preference[key]
+    );
+
+    Item_buy.aggregate([
+      {
+        $match: {
+          status: { $ne: "finished" },
+        },
+      },
+      {
+        $addFields: {
+          isPreferred: {
+            $in: ["$category", preferredCategories],
+          },
+        },
+      },
+      {
+        $sort: { isPreferred: -1, date: 1 }, // Sorting by preference first, then by date (earliest first)
+      },
+    ])
+      .then((items) => {
+        items = items.map((item) => {
+          if (item.img && item.img.data) {
+            item.img.data = item.img.data.toString("base64"); // Convert image data to base64
+            item._id = item._id.toString();
+            item.img = item.img.toObject ? item.img.toObject() : item.img;
+          }
+          return item;
+        });
+        res.render("buy", {
+          shop: items,
+          loggedIn: req.session.user !== undefined,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching the data");
       });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send("An error occurred while fetching the data");
-    });
-  // }
+  }
 });
 
 app.post("/buy", function (req, res) {
@@ -230,21 +283,15 @@ app.post("/buy", function (req, res) {
     { _id: key },
     { $set: { status: "requested" } },
     { upsert: true, new: true } // 'new: true' to return the document after update if you need it
-  )
-    .then((doc) => {
-      // Handle the updated document, if needed
-      console.log("Update successful:", doc);
-    })
-    .catch((err) => {
-      console.log("Something wrong when updating data!", err);
-    });
+  ).catch((err) => {
+    console.log("Something wrong when updating data!", err);
+  });
 });
 
 app.get("/buy/:id", (req, res) => {
   if (req.session.user === undefined) {
     res.redirect("/login");
   }
-
   let id = req.params.id;
   const objectId = new mongoose.Types.ObjectId(id);
   Item_buy.findOne({ _id: objectId })
@@ -304,7 +351,6 @@ app.get("/sell", function (req, res) {
     if (!fs.existsSync("uploads")) {
       fs.mkdirSync("./uploads");
     }
-
     res.render("sell", { loggedIn: true });
   }
 });
@@ -337,13 +383,13 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
         contentType: req.file.mimetype,
       },
       status: "posted",
+      category: req.body.category,
       updated_at: Date.now(),
     })
       .save() // save() returns a promise
       .then((item) => {
         // delete the image from the uploads folder
         fs.unlinkSync("./uploads/" + req.file.filename);
-
         // Handle successful save
         // update user information by adding new product in place
         return User.findOneAndUpdate(
@@ -357,13 +403,25 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
         );
       })
       .then((doc) => {
+        // find all users that have preferences for this category and send notification
+        User.find({
+          [`preferences.preference.${req.body.category}`]: true,
+        }).then((users) => {
+          users.forEach((user) => {
+            pushMessages(
+              { email: user.email },
+              `There is a new item ${req.body.title} in ${req.body.category} category!`
+            );
+          });
+        });
+
         // Handle successful user update
         res.redirect("/buy");
       })
       .catch((err) => {
         // Handle errors
         res.render("sell", {
-          error: "Error saving or updating item!",
+          error: `Error saving or updating item! ${err}`,
           loggedIn: true,
         });
       });
@@ -372,12 +430,6 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
 
 // activity page for users to post new activities
 app.get("/activity", function (req, res) {
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // } else {
   Activity.find({ date: { $gt: new Date() } })
     .then((varToStoreResult) => {
       let items = varToStoreResult.map((item) => {
@@ -524,12 +576,15 @@ app.get("/personal", function (req, res) {
       requesters: req.session.user.email,
       status: "requested",
     }).exec();
-
-    Promise.all([itemQuery, requestQuery])
-      .then(([items, requests]) => {
+    const userQuery = User.findOne({
+      username: req.session.user.username,
+    }).exec();
+    Promise.all([itemQuery, requestQuery, userQuery])
+      .then(([items, requests, user]) => {
         res.render("personal", {
           shop: items,
           request: requests,
+          preference: user.preferences.preference,
           loggedIn: true,
           sendEmail: req.session.user.preferences.sendEmail,
         });
@@ -612,24 +667,56 @@ app.post("/personal", function (req, res) {
 
 app.post("/personal/updatePreference", function (req, res) {
   const email = req.session.user.email;
-  const sendEmail = req.body.sendEmail === "on";
-  User.findOneAndUpdate(
-    { email: email },
-    {
-      $set: {
-        "preferences.sendEmail": sendEmail,
+  if (req.body.category === undefined) {
+    const sendEmail = req.body.sendEmail === "on";
+    User.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          "preferences.sendEmail": sendEmail,
+        },
       },
-    },
-    { new: true }
-  )
-    .then((result) => {
-      req.session.user.preferences.sendEmail = sendEmail;
-      res.redirect("/personal");
-    })
-    .catch((err) => {
-      console.log("Something wrong when updating data!", err);
-      res.status(500).send("Internal Server Error");
-    });
+      { new: true }
+    )
+      .then((result) => {
+        req.session.user.preferences.sendEmail = sendEmail;
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
+      });
+  } else {
+    const preference =
+      typeof req.body.category === "string"
+        ? [req.body.category]
+        : req.body.category;
+    User.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          "preferences.preference": [
+            "Books",
+            "Electronics",
+            "Clothes",
+            "Groceries",
+          ].reduce((acc, type) => {
+            acc[type] = preference.includes(type);
+            return acc;
+          }, {}),
+        },
+      },
+      { new: true }
+    )
+      .then((result) => {
+        req.session.user.preferences.preference = result.preferences.preference;
+        res.redirect("/personal");
+      })
+      .catch((err) => {
+        console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
+      });
+  }
 });
 
 // take input from user to register new account
@@ -651,6 +738,7 @@ app.post("/register", (req, res) => {
     req.body.username,
     req.body.email,
     req.body.password,
+    req.body.category,
     error,
     success
   );
@@ -773,6 +861,11 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get("/public-key", async (req, res) => {
+  // get from environment variable (PUSH_PUBLIC_KEY)
+  res.json({ key: process.env.PUSH_PUBLIC_KEY });
+});
+
 app.post(`/save-subscription`, async (req, res) => {
   try {
     const subscription = JSON.stringify(req.body);
@@ -780,6 +873,19 @@ app.post(`/save-subscription`, async (req, res) => {
     user.subscription.push(JSON.parse(subscription));
     await user.save();
     res.status(201).json({ message: "Subscription Successful" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post(`/check-subscription`, async (req, res) => {
+  try {
+    const subscription = JSON.stringify(req.body);
+    const user = await User.findOne({ email: req.session.user.email });
+    const isSubscribed = user.subscription.some(
+      (sub) => sub.endpoint === JSON.parse(subscription).endpoint
+    );
+    res.status(201).json({ message: isSubscribed });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
