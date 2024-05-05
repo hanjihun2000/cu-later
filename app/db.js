@@ -1,5 +1,4 @@
 require("dotenv").config();
-
 const mongoose = require("mongoose");
 
 // item object for sale
@@ -8,6 +7,8 @@ const Item_buy = new mongoose.Schema({
   price: Number,
   description: String,
   status: String,
+  category: String,
+  date: { type: Date, default: Date.now },
   // foreign key to reference owners
   owner: [{ type: String, ref: "User.username" }],
   requesters: [{ type: String, ref: "User.email" }],
@@ -22,6 +23,7 @@ const Activity = new mongoose.Schema({
   title: String,
   description: String,
   status: String,
+  created: { type: Date, default: Date.now },
   date: Date,
   // foreign key to reference organizer and participants
   organizer: [{ type: String, ref: "User.username" }],
@@ -40,6 +42,7 @@ const User = new mongoose.Schema({
   password: { type: String, unique: true, required: true },
   items_buy: [{ type: String, ref: "Item_buy.title" }],
   activity: [{ type: String, ref: "Activity.title" }],
+  preference: [{ type: String, ref: "Item_buy.category" }],
 });
 
 mongoose.model("Item_buy", Item_buy);

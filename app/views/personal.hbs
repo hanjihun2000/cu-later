@@ -171,6 +171,17 @@
                 </table>
             </div>	
         </div>
+        <!--END REQUESTED ITEM AREA-->
+        <!-- USER PREFERENCE INFO -->
+        <h1>Your Preference</h1>
+        <div class="wishlist-area">
+            {{!-- button to manage preferences --}}
+                {{#each preference}}
+                <div class="preference">
+                    <span>{{this}}</span>
+                </div>
+                {{/each}}
+        </div>
 
     {{> import_footer}}
     </body>

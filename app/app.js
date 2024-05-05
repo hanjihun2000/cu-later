@@ -71,17 +71,15 @@ app.get("/", function (req, res) {
 });
 
 app.get("/search/buy", function (req, res) {
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // } else {
   var query = req.query.query;
   Item_buy.find({
     title: { $regex: query, $options: "i" },
     status: { $ne: "finished" },
   })
+    .sort({
+      // sort by date (earliest first)
+      date: -1,
+    })
     .then((varToStoreResult) => {
       let items = varToStoreResult.map((item) => {
         // start mapping images
@@ -105,17 +103,15 @@ app.get("/search/buy", function (req, res) {
 });
 
 app.get("/search/activity", function (req, res) {
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // } else {
   var query = req.query.query;
   Activity.find({
     title: { $regex: query, $options: "i" },
     date: { $gt: new Date() },
   })
+    .sort({
+      // sort by date (earliest first)
+      created: -1,
+    })
     .then((varToStoreResult) => {
       let items = varToStoreResult.map((item) => {
         // start mapping images
@@ -140,35 +136,59 @@ app.get("/search/activity", function (req, res) {
 
 // item buying page
 app.get("/buy", function (req, res) {
-  // check login state
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // }
-  // find all items ready for sale in database, tag finished will be omitted
-  // else {
-  Item_buy.find({ status: { $ne: "finished" } })
-    .then((varToStoreResult) => {
-      let items = varToStoreResult.map((item) => {
-        if (item.img && item.img.data) {
-          item.img.data = item.img.data.toString("base64"); // convert the data into base64
-          item._id = item._id.toString();
-          item.img = item.img.toObject();
-        }
-        return item;
+  var preference = req.session.user ? req.session.user.preference : [];
+  if (!preference || preference.length === 0) {
+    Item_buy.find({ status: { $ne: "finished" } })
+      .sort({
+        // sort by date (earliest first)
+        date: -1,
+      })
+      .then((varToStoreResult) => {
+        let items = varToStoreResult.map((item) => {
+          if (item.img && item.img.data) {
+            item.img.data = item.img.data.toString("base64"); // convert the data into base64
+            item._id = item._id.toString();
+            item.img = item.img.toObject();
+          }
+          return item;
+        });
+        res.render("buy", {
+          shop: items,
+          loggedIn: req.session.user !== undefined,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching the data");
       });
-      res.render("buy", {
-        shop: items,
-        loggedIn: req.session.user !== undefined,
-      });
+  } else {
+    Item_buy.find({
+      category: { $in: preference },
+      status: { $ne: "finished" },
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send("An error occurred while fetching the data");
-    });
-  // }
+      .sort({
+        // sort by date (earliest first)
+        date: 1,
+      })
+      .then((varToStoreResult) => {
+        let items = varToStoreResult.map((item) => {
+          if (item.img && item.img.data) {
+            item.img.data = item.img.data.toString("base64"); // convert the data into base64
+            item._id = item._id.toString();
+            item.img = item.img.toObject();
+          }
+          return item;
+        });
+        res.render("buy", {
+          shop: items,
+          loggedIn: req.session.user !== undefined,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("An error occurred while fetching the data");
+      });
+  }
 });
 
 app.post("/buy", function (req, res) {
@@ -191,7 +211,6 @@ app.get("/buy/:id", (req, res) => {
   if (req.session.user === undefined) {
     res.redirect("/login");
   }
-
   let id = req.params.id;
   const objectId = new mongoose.Types.ObjectId(id);
   Item_buy.findOne({ _id: objectId })
@@ -246,7 +265,6 @@ app.get("/sell", function (req, res) {
     if (!fs.existsSync("uploads")) {
       fs.mkdirSync("./uploads");
     }
-
     res.render("sell", { loggedIn: true });
   }
 });
@@ -279,13 +297,13 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
         contentType: req.file.mimetype,
       },
       status: "posted",
+      category: req.body.category,
       updated_at: Date.now(),
     })
       .save() // save() returns a promise
       .then((item) => {
         // delete the image from the uploads folder
         fs.unlinkSync("./uploads/" + req.file.filename);
-
         // Handle successful save
         // update user information by adding new product in place
         return User.findOneAndUpdate(
@@ -314,12 +332,6 @@ app.post("/sell", upload.single("image"), function (req, res, next) {
 
 // activity page for users to post new activities
 app.get("/activity", function (req, res) {
-  // if (req.session.user === undefined) {
-  //   res.render("home", {
-  //     error: "Please login or register first!",
-  //     loggedIn: false,
-  //   });
-  // } else {
   Activity.find({ date: { $gt: new Date() } })
     .then((varToStoreResult) => {
       let items = varToStoreResult.map((item) => {
@@ -466,12 +478,15 @@ app.get("/personal", function (req, res) {
       requesters: req.session.user.email,
       status: "requested",
     }).exec();
-
-    Promise.all([itemQuery, requestQuery])
-      .then(([items, requests]) => {
+    const userQuery = User.findOne({
+      username: req.session.user.username,
+    }).exec();
+    Promise.all([itemQuery, requestQuery, userQuery])
+      .then(([items, requests, user]) => {
         res.render("personal", {
           shop: items,
           request: requests,
+          preference: user.preference,
           loggedIn: true,
         });
       })
@@ -541,6 +556,7 @@ app.post("/register", (req, res) => {
     req.body.username,
     req.body.email,
     req.body.password,
+    req.body.category,
     error,
     success
   );

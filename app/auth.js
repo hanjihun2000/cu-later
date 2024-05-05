@@ -3,23 +3,27 @@ const mongoose = require("mongoose");
 const User = mongoose.model("User");
 
 // function to register new users
-function register(username, email, password, errorCallback, successCallback) {
+function register(
+  username,
+  email,
+  password,
+  category,
+  errorCallback,
+  successCallback
+) {
   // check if email is valid (CUHK email)
-  console.log(email);
   const validation = /\b1155\d{6}@link.cuhk.edu.hk$/;
   if (!email.match(validation)) {
     console.log("email is not a valid CUHK email!");
     errorCallback({ message: "EMAIL IS NOT A VALID CUHK EMAIL" });
     return;
   }
-
   const emailValidation = /\b\w+@\w+\.\w+/;
   if (username.match(emailValidation)) {
     console.log("Username is an email address!");
     errorCallback({ message: "USERNAME IS AN EMAIL ADDRESS" });
     return;
   }
-
   // check if user already exists
   User.findOne({ username: username })
     .then((result) => {
@@ -37,6 +41,7 @@ function register(username, email, password, errorCallback, successCallback) {
         username: username,
         email: email,
         password: hash,
+        preference: category,
         actions: [],
       }).save();
     })
@@ -58,7 +63,6 @@ function login(username, password, errorCallback, successCallback) {
         errorCallback({ message: "USER NOT FOUND" });
         return;
       }
-
       // unhash passwords using bcrypt
       bcrypt
         .compare(password, user.password)
