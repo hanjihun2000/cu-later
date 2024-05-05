@@ -517,6 +517,7 @@ app.get("/personal", function (req, res) {
           shop: items,
           request: requests,
           loggedIn: true,
+          sendEmail: req.session.user.preferences.sendEmail,
         });
       })
       .catch((err) => {
@@ -593,6 +594,28 @@ app.post("/personal", function (req, res) {
         res.status(500).send("Internal Server Error");
       });
   }
+});
+
+app.post("/personal/updatePreference", function (req, res) {
+  const email = req.session.user.email;
+  const sendEmail = req.body.sendEmail === "on";
+  User.findOneAndUpdate(
+    { email: email },
+    {
+      $set: {
+        "preferences.sendEmail": sendEmail,
+      },
+    },
+    { new: true }
+  )
+    .then((result) => {
+      req.session.user.preferences.sendEmail = sendEmail;
+      res.redirect("/personal");
+    })
+    .catch((err) => {
+      console.log("Something wrong when updating data!", err);
+      res.status(500).send("Internal Server Error");
+    });
 });
 
 // take input from user to register new account

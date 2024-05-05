@@ -40,6 +40,9 @@ const User = new mongoose.Schema({
   password: { type: String, unique: true, required: true },
   items_buy: [{ type: String, ref: "Item_buy.title" }],
   activity: [{ type: String, ref: "Activity.title" }],
+  preferences: {
+    sendEmail: { type: Boolean, default: false },
+  },
   subscription: [
     {
       endpoint: String,

@@ -30,13 +30,13 @@
                     <span class="slider round"></span>
                 </label>
             </div>
-            <div class="select-block">
+            <form method="POST" action="/personal/updatePreference" onchange="this.submit()" class="select-block">
                 <p>Enable Email</p>
                 <label class="switch">
-                    <input type="checkbox" id="email">
+                    <input type="checkbox" id="sendEmail" name="sendEmail" {{#if sendEmail}}checked{{/if}}>
                     <span class="slider round"></span>
                 </label>
-            </div>
+            </form>
         </div>
 
 
