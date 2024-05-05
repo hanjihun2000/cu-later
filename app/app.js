@@ -76,11 +76,8 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
-const pushNotification = async (userEmail, notification_body) => {
-  const user = await User.findOne({
-    email: userEmail,
-  });
-  user.subscription.forEach(async (sub) => {
+const pushNotification = async (user, notification_body) => {
+  user?.subscription?.forEach(async (sub) => {
     await sendNotification(sub, {
       body: notification_body,
       data: {
@@ -93,9 +90,14 @@ const pushNotification = async (userEmail, notification_body) => {
 
 const pushEmail = async (userEmail, notification_body) => {};
 
-const pushMessages = async (userEmail, notification_body) => {
-  pushNotification(userEmail, notification_body);
-  // pushEmail(userEmail, notification_body);
+const pushMessages = async (user, notification_body) => {
+  // get user email from username
+  const userObj = await User.findOne(
+    user.email ? { email: user.email } : { username: user.username }
+  );
+
+  pushNotification(userObj, notification_body);
+  pushEmail(userObj.email, notification_body);
 };
 
 // default home page
@@ -264,8 +266,10 @@ app.post("/buy/:id", function (req, res) {
   )
     .then((doc) => {
       // search doc.owner email by its username(doc.owner) and send notification
-      const ownerEmail = User.findOne({ username: doc.owner }).email;
-      pushMessages(ownerEmail, `You have a new request for ${doc.title}!`);
+      pushMessages(
+        { username: doc.owner },
+        `You have a new request for ${doc.title}!`
+      );
       res.redirect("/personal");
     })
     .catch((err) => {
@@ -528,45 +532,65 @@ app.post("/personal", function (req, res) {
   if (Object.values(req.body)[0] === "Finished") {
     result = "finished";
     key = Object.keys(req.body)[0];
-    Item_buy.findOneAndUpdate(
-      { _id: key },
-      {
-        $set: { status: result, requesters: [] },
-      },
-      { upsert: true, new: true }
-    )
+    Item_buy.findOne({ _id: key }) // Find the document before updating
       .then((doc) => {
-        console.log("Update successful:", doc);
-        const requester = doc.requesters;
-        requester.forEach((email) => {
-          pushMessages(email, `Transaction for ${doc.title} is completed!`);
+        if (!doc) {
+          // Handle case where document is not found
+          return res.status(404).send("Document not found");
+        }
+
+        // Update document fields
+        doc.status = result;
+        const requesters = doc.requesters;
+        doc.requesters = [];
+
+        // Save the updated document
+        return doc.save().then((updatedDoc) => {
+          // Use the updated document here
+          requesters.forEach((email) => {
+            pushMessages(
+              { email: email },
+              `Transaction for ${updatedDoc.title} is completed!`
+            );
+          });
+          res.redirect("/personal");
         });
-        res.redirect("/personal");
       })
       .catch((err) => {
         console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
       });
   } else {
     // remove all requesters from list, transaction is denied and item is reposted for requests
     result = "posted";
     key = Object.keys(req.body)[0];
-    Item_buy.findOneAndUpdate(
-      { _id: key },
-      {
-        $set: { status: result, requesters: [] },
-      },
-      { upsert: true, new: true }
-    )
+    Item_buy.findOne({ _id: key }) // Find the document before updating
       .then((doc) => {
-        console.log("Update successful1:", doc);
-        const requester = doc.requesters;
-        requester.forEach((email) => {
-          pushMessages(email, `Transaction for ${doc.title} is denied!`);
+        if (!doc) {
+          // Handle case where document is not found
+          return res.status(404).send("Document not found");
+        }
+
+        // Update document fields
+        doc.status = result;
+        const requesters = doc.requesters;
+        doc.requesters = [];
+
+        // Save the updated document
+        return doc.save().then((updatedDoc) => {
+          // Use the updated document here
+          requesters.forEach((email) => {
+            pushMessages(
+              { email: email },
+              `Transaction for ${updatedDoc.title} is denied!`
+            );
+          });
+          res.redirect("/personal");
         });
-        res.redirect("/personal");
       })
       .catch((err) => {
         console.log("Something wrong when updating data!", err);
+        res.status(500).send("Internal Server Error");
       });
   }
 });
