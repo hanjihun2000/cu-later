@@ -35,6 +35,7 @@ const checkSubscription = async () => {
     body: JSON.stringify(subscription),
   });
   const data = await response.json();
+  console.log(data);
   return data.message;
 };
 
@@ -89,6 +90,7 @@ self.addEventListener("push", function (event) {
 });
 
 self.addEventListener("message", async (event) => {
+  console.log("message event", event);
   if (event.data === "checkSubscription") {
     const data = await checkSubscription();
     event.ports[0].postMessage(data);
