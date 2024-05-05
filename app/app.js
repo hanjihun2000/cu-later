@@ -803,23 +803,28 @@ app.post("/cuhkLogin", (req, res) => {
           throw new Error("Invalid CUHK username or password!");
         }
 
-        auth.startAuthenticatedSession(
-          req,
-          {
-            username: studentNumber,
-            email: username,
-            actions: [],
-          },
-          (err) => {
+        function success(user) {
+          // start new session with registered user
+          auth.startAuthenticatedSession(req, user, (err = undefined) => {
             if (err) {
               console.log(err);
             }
-            // close the window after login
             res.send(
               "<script>window.close();</script><h1>Login successful!</h1><p>You can close this window now.</p>"
             );
-          },
-          { type: "CUHK" }
+          });
+        }
+
+        function error(obj) {
+          res.render("cuhkLogin", { error: obj.message });
+        }
+
+        auth.CUHKLogin(
+          studentNumber,
+          username,
+          req.body.password,
+          error,
+          success
         );
       })
       .catch((error) => {

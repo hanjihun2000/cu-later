@@ -117,9 +117,48 @@ function startAuthenticatedSession(
   });
 }
 
+const CUHKLogin = (
+  username,
+  email,
+  password,
+  errorCallback,
+  successCallback
+) => {
+  // check if the email is already in the database
+  User.findOne({ email: email })
+    .then((user) => {
+      if (user) {
+        // if the email is already in the database, then return success
+        successCallback(user);
+      }
+    })
+    .catch((err) => {
+      errorCallback({ message: err });
+    });
+
+  console.log(
+    "username",
+    username,
+    "email",
+    email,
+    "password",
+    password,
+    "CUHK"
+  );
+  return register(
+    username,
+    email,
+    password,
+    [],
+    errorCallback,
+    successCallback
+  );
+};
+
 module.exports = {
   startAuthenticatedSession: startAuthenticatedSession,
   register: register,
   login: login,
   logout: logout,
+  CUHKLogin: CUHKLogin,
 };
