@@ -12,10 +12,7 @@ const urlB64ToUint8Array = (base64String) => {
 };
 
 const saveSubscription = async (subscription) => {
-  console.log("subscription", JSON.stringify(subscription));
-
-  const SERVER_URL = "http://localhost:8080/save-subscription";
-  const response = await fetch(SERVER_URL, {
+  const response = await fetch("http://localhost:8080/save-subscription", {
     method: "post",
     headers: {
       "Content-Type": "application/json",
@@ -24,6 +21,21 @@ const saveSubscription = async (subscription) => {
   });
   return response.json();
 };
+
+// on unregistering service worker
+self.addEventListener("unregister", async () => {
+  const subscription = await self.registration.pushManager.getSubscription();
+  if (subscription) {
+    fetch("http://localhost:8080/unsubscribe", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(subscription),
+    });
+    return subscription.unsubscribe();
+  }
+});
 
 self.addEventListener("activate", async () => {
   try {
@@ -34,10 +46,9 @@ self.addEventListener("activate", async () => {
       ),
       userVisibleOnly: true,
     });
-    const response = await saveSubscription(subscription);
-    console.log("response", response);
+    await saveSubscription(subscription);
   } catch (err) {
-    console.log("Error", err);
+    window.alert("Error", err);
   }
 });
 
@@ -47,13 +58,10 @@ const showLocalNotification = (title, data, swRegistration) => {
 
 self.addEventListener("push", function (event) {
   if (event.data) {
-    console.log("Push event!! ", JSON.parse(event.data.text()));
     showLocalNotification(
       "Notification ",
       JSON.parse(event.data.text()),
       self.registration
     );
-  } else {
-    console.log("Push event but no data");
   }
 });

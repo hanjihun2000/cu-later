@@ -76,6 +76,28 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
+const pushNotification = async (userEmail, notification_body) => {
+  const user = await User.findOne({
+    email: userEmail,
+  });
+  user.subscription.forEach(async (sub) => {
+    await sendNotification(sub, {
+      body: notification_body,
+      data: {
+        requestId: Math.random().toString(36).substring(2, 15),
+        username: user.username,
+      },
+    });
+  });
+};
+
+const pushEmail = async (userEmail, notification_body) => {};
+
+const pushMessages = async (userEmail, notification_body) => {
+  pushNotification(userEmail, notification_body);
+  // pushEmail(userEmail, notification_body);
+};
+
 // default home page
 app.get("/", function (req, res) {
   if (req.session.user === undefined) {
@@ -241,6 +263,9 @@ app.post("/buy/:id", function (req, res) {
     { upsert: true, new: true } // new: true to get the updated document in the response
   )
     .then((doc) => {
+      // search doc.owner email by its username(doc.owner) and send notification
+      const ownerEmail = User.findOne({ username: doc.owner }).email;
+      pushMessages(ownerEmail, `You have a new request for ${doc.title}!`);
       res.redirect("/personal");
     })
     .catch((err) => {
@@ -511,7 +536,11 @@ app.post("/personal", function (req, res) {
       { upsert: true, new: true }
     )
       .then((doc) => {
-        console.log(doc);
+        console.log("Update successful:", doc);
+        const requester = doc.requesters;
+        requester.forEach((email) => {
+          pushMessages(email, `Transaction for ${doc.title} is completed!`);
+        });
         res.redirect("/personal");
       })
       .catch((err) => {
@@ -529,6 +558,11 @@ app.post("/personal", function (req, res) {
       { upsert: true, new: true }
     )
       .then((doc) => {
+        console.log("Update successful1:", doc);
+        const requester = doc.requesters;
+        requester.forEach((email) => {
+          pushMessages(email, `Transaction for ${doc.title} is denied!`);
+        });
         res.redirect("/personal");
       })
       .catch((err) => {
@@ -690,23 +724,15 @@ app.post(`/save-subscription`, async (req, res) => {
   }
 });
 
-app.post(`/send-notification`, async (req, res) => {
+app.post(`/unsubscribe`, async (req, res) => {
   try {
-    // get the user's subscription
-    const userEmail = "Anson.12666@icloud.com";
-    const notification_body = "Test notification";
-
-    const user = await User.findOne({ email: userEmail });
-    user.subscription.forEach(async (sub) => {
-      await sendNotification(sub, {
-        body: notification_body,
-        data: {
-          requestId: Math.random().toString(36).substring(2, 15),
-          username: user.username,
-        },
-      });
-      console.log(`Notification sent to ${userEmail}`);
-    });
+    const subscription = JSON.stringify(req.body);
+    const user = await User.findOne({ email: req.session.user.email });
+    user.subscription = user.subscription.filter(
+      (sub) => JSON.stringify(sub) !== subscription
+    );
+    await user.save();
+    res.status(201).json({ message: "Unsubscription Successful" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
