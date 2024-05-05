@@ -196,6 +196,7 @@ form .error {
   user-select: none;
   outline: none;
   padding: 15px 0;
+  --webkit-appearance: none;
 }
 
 @media (max-width: 768px) {
