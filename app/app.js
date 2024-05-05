@@ -862,8 +862,11 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/public-key", async (req, res) => {
-  // get from environment variable (PUSH_PUBLIC_KEY)
-  res.json({ key: process.env.PUSH_PUBLIC_KEY });
+  const keyJson = fs.readFileSync(
+    process.env.PUSH_KEY_PATH || "/etc/secrets/webPushKeys.json"
+  );
+  const { publicKey } = JSON.parse(keyJson);
+  res.json({ key: publicKey });
 });
 
 app.post(`/save-subscription`, async (req, res) => {

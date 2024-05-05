@@ -7,7 +7,9 @@ services:
     restart: "no"
     volumes:
       - cert:/usr/src/certs
-    command: sh -c "openssl req -nodes -new -x509 -keyout /usr/src/certs/key.pem -out /usr/src/certs/cert.pem -days 365 -subj '/C=HK/ST=Hong Kong/O=CU Later'"
+    command: sh -c "npm install -g web-push && \
+      openssl req -nodes -new -x509 -keyout /usr/src/certs/key.pem -out /usr/src/certs/cert.pem -days 365 -subj '/C=HK/ST=Hong Kong/O=CU Later' && \
+      npx web-push generate-vapid-keys --json > /usr/src/certs/webPushKeys.json"
 
   app:
     image: node:latest
