@@ -217,22 +217,34 @@ app.get("/buy", function (req, res) {
         res.status(500).send("An error occurred while fetching the data");
       });
   } else {
-    Item_buy.find({
-      $or: Object.keys(preference).map((category) => ({
-        category: category,
-      })),
-      status: { $ne: "finished" },
-    })
-      .sort({
-        // sort by date (earliest first)
-        date: 1,
-      })
-      .then((varToStoreResult) => {
-        let items = varToStoreResult.map((item) => {
+    const preferredCategories = Object.keys(preference).filter(
+      (key) => preference[key]
+    );
+
+    Item_buy.aggregate([
+      {
+        $match: {
+          category: { $in: preferredCategories },
+          status: { $ne: "finished" },
+        },
+      },
+      {
+        $addFields: {
+          isPreferred: {
+            $in: ["$category", preferredCategories],
+          },
+        },
+      },
+      {
+        $sort: { isPreferred: -1, date: 1 }, // Sorting by preference first, then by date (earliest first)
+      },
+    ])
+      .then((items) => {
+        items = items.map((item) => {
           if (item.img && item.img.data) {
-            item.img.data = item.img.data.toString("base64"); // convert the data into base64
+            item.img.data = item.img.data.toString("base64"); // Convert image data to base64
             item._id = item._id.toString();
-            item.img = item.img.toObject();
+            item.img = item.img.toObject ? item.img.toObject() : item.img;
           }
           return item;
         });
