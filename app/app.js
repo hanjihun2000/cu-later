@@ -17,6 +17,7 @@ const https = require("https");
 var path = require("path");
 var bodyParser = require("body-parser");
 const crypto = require("crypto");
+const sendmail = require("sendmail")();
 
 // register partials for handlebars
 var partialsDir = __dirname + "/views/partials";
@@ -88,7 +89,20 @@ const pushNotification = async (user, notification_body) => {
   });
 };
 
-const pushEmail = async (userEmail, notification_body) => {};
+const pushEmail = async (userEmail, notification_body) => {
+  sendmail(
+    {
+      from: "CU-LATER",
+      to: userEmail,
+      subject: "CU-LATER Notification",
+      html: notification_body,
+    },
+    function (err, reply) {
+      console.log(err && err.stack);
+      // console.dir(reply);
+    }
+  );
+};
 
 const pushMessages = async (user, notification_body) => {
   // get user email from username
