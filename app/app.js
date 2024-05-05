@@ -124,22 +124,41 @@ app.get("/", function (req, res) {
 });
 
 app.get("/search/buy", function (req, res) {
+  var preference = req.session.user
+    ? req.session.user.preferences.preference
+    : [];
+
   var query = req.query.query;
-  Item_buy.find({
-    title: { $regex: query, $options: "i" },
-    status: { $ne: "finished" },
-  })
-    .sort({
-      // sort by date (earliest first)
-      date: -1,
-    })
-    .then((varToStoreResult) => {
-      let items = varToStoreResult.map((item) => {
-        // start mapping images
+  var preferredCategories = Object.keys(preference).filter(
+    (key) => preference[key]
+  );
+
+  Item_buy.aggregate([
+    {
+      $match: {
+        $and: [
+          { title: { $regex: query, $options: "i" } },
+          { status: { $ne: "finished" } },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        isPreferred: {
+          $in: ["$category", preferredCategories],
+        },
+      },
+    },
+    {
+      $sort: { isPreferred: -1, date: -1 }, // Sorting by preference first, then by date (newest first)
+    },
+  ])
+    .then((items) => {
+      items = items.map((item) => {
         if (item.img && item.img.data) {
-          item.img.data = item.img.data.toString("base64"); // convert the data into base64
+          item.img.data = item.img.data.toString("base64"); // Convert image data to base64
           item._id = item._id.toString();
-          item.img = item.img.toObject();
+          item.img = item.img.toObject ? item.img.toObject() : item.img;
         }
         return item;
       });
@@ -152,7 +171,6 @@ app.get("/search/buy", function (req, res) {
       console.log(err);
       res.status(500).send("An error occurred while fetching the data");
     });
-  // }
 });
 
 app.get("/search/activity", function (req, res) {
@@ -224,7 +242,6 @@ app.get("/buy", function (req, res) {
     Item_buy.aggregate([
       {
         $match: {
-          category: { $in: preferredCategories },
           status: { $ne: "finished" },
         },
       },
@@ -691,8 +708,8 @@ app.post("/personal/updatePreference", function (req, res) {
       },
       { new: true }
     )
-      .then(() => {
-        req.session.user.preferences.preference = preference;
+      .then((result) => {
+        req.session.user.preferences.preference = result.preferences.preference;
         res.redirect("/personal");
       })
       .catch((err) => {
