@@ -218,7 +218,10 @@ app.get("/buy", function (req, res) {
       });
   } else {
     Item_buy.find({
-      category: { $in: preference },
+      $or: ["Books", "Electronics", "Clothes", "Gloceries"].map((category) => ({
+        category,
+        [`preferences.preference.${category}`]: true,
+      })),
       status: { $ne: "finished" },
     })
       .sort({
@@ -657,17 +660,20 @@ app.post("/personal/updatePreference", function (req, res) {
       { email: email },
       {
         $set: {
-          "preferences.preference": {
-            Books: preference.includes("Books"),
-            Electronics: preference.includes("Electronics"),
-            Clothes: preference.includes("Clothes"),
-            Gloceries: preference.includes("Gloceries"),
-          },
+          "preferences.preference": [
+            "Books",
+            "Electronics",
+            "Clothes",
+            "Groceries",
+          ].reduce((acc, type) => {
+            acc[type] = preference.includes(type);
+            return acc;
+          }, {}),
         },
       },
       { new: true }
     )
-      .then((result) => {
+      .then(() => {
         req.session.user.preferences.preference = preference;
         res.redirect("/personal");
       })

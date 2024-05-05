@@ -37,11 +37,21 @@ function register(
     })
     .then((hash) => {
       // create new user
+
+      const preference = typeof category === "string" ? [category] : category;
+
       return new User({
         username: username,
         email: email,
         password: hash,
-        preference: category,
+        preferences: {
+          preference: {
+            Books: preference.includes("Books"),
+            Electronics: preference.includes("Electronics"),
+            Clothes: preference.includes("Clothes"),
+            Gloceries: preference.includes("Gloceries"),
+          },
+        },
         actions: [],
       }).save();
     })
