@@ -1,11 +1,12 @@
 const webpush = require("web-push");
-const { PUSH_PRIVATE_KEY, PUSH_PUBLIC_KEY } = process.env;
-//setting our previously generated VAPID keys
-webpush.setVapidDetails(
-  "mailto:admin@cu-later.com",
-  PUSH_PUBLIC_KEY,
-  PUSH_PRIVATE_KEY
+const fs = require("fs");
+
+const keyJson = fs.readFileSync(
+  process.env.PUSH_KEY_PATH || "/etc/secrets/webPushKeys.json"
 );
+const { publicKey, privateKey } = JSON.parse(keyJson);
+
+webpush.setVapidDetails("mailto:admin@cu-later.com", publicKey, privateKey);
 //function to send the notification to the subscribed device
 const sendNotification = async (subscription, dataToSend) => {
   try {
