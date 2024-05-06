@@ -124,7 +124,7 @@ form {
   user-select: none;
   outline: none;
   padding: 15px 0;
-  --webkit-appearance: none;
+  -webkit-appearance: none;
 }
 
 .File-Form-Field input:valid ~ .File-Form-Label {
