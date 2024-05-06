@@ -452,6 +452,17 @@ app.get("/activity", function (req, res) {
   // }
 });
 
+app.post("/activity", function (req, res) {
+  key = Object.keys(req.body)[0];
+  Activity.findOneAndUpdate(
+    { _id: key },
+    { $set: { status: "requested" } },
+    { upsert: true, new: true } // 'new: true' to return the document after update if you need it
+  ).catch((err) => {
+    console.log("Something wrong when updating data!", err);
+  });
+});
+
 // activity detail page
 app.get("/activity/:id", (req, res) => {
   if (req.session.user === undefined) {

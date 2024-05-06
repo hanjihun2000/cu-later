@@ -22,6 +22,7 @@ services:
     environment:
       - SSL_KEY=/usr/src/certs/key.pem
       - SSL_CERT=/usr/src/certs/cert.pem
+      - PUSH_KEY_PATH=/usr/src/certs/webPushKeys.json
       - NODE_ENV=production
       - DB=mongodb://admin:password@db:27017
       - PORT=80
