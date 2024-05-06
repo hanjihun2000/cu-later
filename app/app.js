@@ -825,9 +825,10 @@ app.post("/cuhkLogin", (req, res) => {
             );
           });
         }
-
         function error(obj) {
-          res.render("cuhkLogin", { error: obj.message });
+          res.render("cuhkLogin", {
+            error: obj.message,
+          });
         }
 
         auth.CUHKLogin(
