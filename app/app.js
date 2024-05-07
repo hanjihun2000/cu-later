@@ -818,16 +818,21 @@ app.post("/cuhkLogin", (req, res) => {
           // start new session with registered user
           auth.startAuthenticatedSession(req, user, (err = undefined) => {
             if (err) {
-              console.log(err);
+              return res.render("cuhkLogin", {
+                error: err,
+              });
             }
-            res.send(
-              "<script>window.close();</script><h1>Login successful!</h1><p>You can close this window now.</p>"
-            );
+            return res
+              .status(200)
+              .send(
+                "<script>window.close();</script><h1>Login successful!</h1><p>You can close this window now.</p>"
+              );
           });
         }
-
         function error(obj) {
-          res.render("cuhkLogin", { error: obj.message });
+          res.render("cuhkLogin", {
+            error: obj.message,
+          });
         }
 
         auth.CUHKLogin(

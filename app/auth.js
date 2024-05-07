@@ -26,7 +26,7 @@ function register(
   User.findOne({ username: username })
     .then((result) => {
       if (result) {
-        errorCallback({ message: "USERNAME ALREADY EXISTS" });
+        throw new Error("USERNAME ALREADY EXISTS");
       } else {
         // hash passwords to prevent leak
         return bcrypt.hash(password, 10);
@@ -56,7 +56,6 @@ function register(
       successCallback(user);
     })
     .catch((err) => {
-      console.log("Error:", err);
       errorCallback({ message: "DOCUMENT SAVE ERROR" });
     });
 }
@@ -136,15 +135,6 @@ const CUHKLogin = (
       errorCallback({ message: err });
     });
 
-  console.log(
-    "username",
-    username,
-    "email",
-    email,
-    "password",
-    password,
-    "CUHK"
-  );
   return register(
     username,
     email,
