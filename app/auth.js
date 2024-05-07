@@ -46,7 +46,7 @@ function register(
             Books: preference.includes("Books"),
             Electronics: preference.includes("Electronics"),
             Clothes: preference.includes("Clothes"),
-            Gloceries: preference.includes("Gloceries"),
+            Groceries: preference.includes("Groceries"),
           },
         },
         actions: [],

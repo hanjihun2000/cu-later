@@ -47,7 +47,7 @@ const User = new mongoose.Schema({
       Books: { type: Boolean, default: false },
       Electronics: { type: Boolean, default: false },
       Clothes: { type: Boolean, default: false },
-      Gloceries: { type: Boolean, default: false },
+      Groceries: { type: Boolean, default: false },
     },
     sendEmail: { type: Boolean, default: false },
   },
